@@ -1,0 +1,36 @@
+<div class="wallet-card">
+  <div class="wallet-header">
+    <h3 class="wallet-title">Wallet Balance</h3>
+    <span class="balance-amount">{{formatPrice(balance)}}</span>
+  </div>
+  
+  <div class="topup-section">
+    <h4>Top Up Wallet</h4>
+    
+    <div class="preset-amounts">
+      <button *ngFor="let amount of presetAmounts" 
+              class="preset-btn"
+              [class.active]="selectedAmount === amount"
+              (click)="selectAmount(amount)">
+        {{formatPrice(amount)}}
+      </button>
+    </div>
+    
+    <div class="custom-amount">
+      <label for="customAmount">Custom Amount:</label>
+      <input type="number" 
+             id="customAmount"
+             [(ngModel)]="customAmount"
+             (ngModelChange)="onCustomAmountChange($event)"
+             placeholder="Enter amount"
+             min="1"
+             step="0.01">
+    </div>
+    
+    <button class="topup-btn" 
+            [disabled]="!selectedAmount || loading"
+            (click)="onTopUp()">
+      {{loading ? 'Processing...' : 'Top Up ' + formatPrice(selectedAmount || 0)}}
+    </button>
+  </div>
+</div>

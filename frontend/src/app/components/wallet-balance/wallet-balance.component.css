@@ -1,0 +1,114 @@
+.wallet-card {
+  background: var(--gradient-primary-135);
+  color: white;
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.wallet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.wallet-title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+.balance-amount {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.topup-section h4 {
+  margin: 0 0 var(--space-md) 0;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.preset-amounts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.preset-btn {
+  padding: var(--space-sm);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: transparent;
+  color: white;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.preset-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.preset-btn.active {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: white;
+}
+
+.custom-amount {
+  margin-bottom: var(--space-md);
+}
+
+.custom-amount label {
+  display: block;
+  margin-bottom: var(--space-sm);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.custom-amount input {
+  width: 100%;
+  padding: var(--space-sm);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  box-sizing: border-box;
+}
+
+.custom-amount input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.custom-amount input:focus {
+  outline: none;
+  border-color: white;
+}
+
+.topup-btn {
+  width: 100%;
+  padding: var(--space-md);
+  border: none;
+  background: white;
+  color: var(--color-secondary-2);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.topup-btn:hover:not(:disabled) {
+  background: var(--color-background);
+  transform: translateY(-1px);
+}
+
+.topup-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

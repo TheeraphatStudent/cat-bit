@@ -1,0 +1,23 @@
+<div class="cart-item">
+  <div class="item-image">
+    <img [src]="item.game.image || '/assets/default-game.jpg'" 
+         [alt]="item.game.name"
+         onerror="this.src='/assets/default-game.jpg'">
+  </div>
+  
+  <div class="item-details">
+    <h4 class="item-name">{{item.game.name}}</h4>
+    <p class="item-type">{{item.game.type}}</p>
+    <p class="item-description">{{truncateText(item.game.description, 80)}}</p>
+  </div>
+  
+  <div class="item-price">
+    <span class="price">{{formatPrice(item.game.price)}}</span>
+  </div>
+  
+  <div class="item-actions">
+    <button class="remove-btn" (click)="onRemove()" title="Remove from cart">
+      <i class="remove-icon">×</i>
+    </button>
+  </div>
+</div>

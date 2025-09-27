@@ -1,0 +1,87 @@
+/* Design Tokens CSS Variables */
+:root {
+  /* Primary Colors */
+  --color-primary-1: #c89515;
+  --color-primary-2: #f9c33e;
+  --color-primary-3: #ffe29a;
+  
+  /* Secondary Colors */
+  --color-secondary-1: #29174f;
+  --color-secondary-2: #2c0977;
+  --color-secondary-3: #4b23a1;
+  
+  /* Gradients */
+  --gradient-primary: linear-gradient(180deg, #2c0977 0%, #f9c33e 100%);
+  --gradient-primary-reverse: linear-gradient(180deg, #f9c33e 0%, #2c0977 100%);
+  --gradient-primary-45: linear-gradient(45deg, #2c0977 0%, #f9c33e 100%);
+  --gradient-primary-135: linear-gradient(135deg, #2c0977 0%, #f9c33e 100%);
+  
+  /* Semantic Colors */
+  --color-background: #f5f7fa;
+  --color-surface: #ffffff;
+  --color-text-primary: #2d3748;
+  --color-text-secondary: #718096;
+  --color-text-muted: #a0aec0;
+  --color-border: #e2e8f0;
+  --color-border-hover: #cbd5e0;
+  
+  /* Status Colors */
+  --color-success: #48bb78;
+  --color-warning: #ed8936;
+  --color-error: #e53e3e;
+  --color-info: #4299e1;
+  
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(44, 9, 119, 0.1);
+  --shadow-md: 0 4px 12px rgba(44, 9, 119, 0.15);
+  --shadow-lg: 0 8px 25px rgba(44, 9, 119, 0.2);
+  --shadow-xl: 0 20px 60px rgba(44, 9, 119, 0.25);
+  
+  /* Border Radius */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 50%;
+  
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  
+  /* Typography */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 28px;
+  --font-size-4xl: 36px;
+  
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: #1a202c;
+    --color-surface: #2d3748;
+    --color-text-primary: #f7fafc;
+    --color-text-secondary: #e2e8f0;
+    --color-text-muted: #a0aec0;
+    --color-border: #4a5568;
+    --color-border-hover: #718096;
+  }
+}

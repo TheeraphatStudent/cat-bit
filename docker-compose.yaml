@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15
+    container_name: gameshop_db
+    environment:
+      POSTGRES_DB: gameshop
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/config/init.sql:/docker-entrypoint-initdb.d/init.sql:ro,Z
+    networks:
+      - gameshop_network
+
+  # Express.js Backend API
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.backend
+    container_name: gameshop_api
+    # user: "1000:1000"
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: gameshop
+      DB_USER: postgres
+      DB_PASSWORD: password
+      JWT_SECRET: your_jwt_secret_key_here
+      JWT_EXPIRES_IN: 7d
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    volumes:
+      - ./backend:/app
+      - uploads_data:/app/uploads
+    networks:
+      - gameshop_network
+    # command: npm run dev
+
+  # Angular Frontend
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.frontend
+    container_name: gameshop_web
+    # user: "1000:1000"
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./frontend:/app
+    networks:
+      - gameshop_network
+    depends_on:
+      - api
+    # command: npm start
+
+volumes:
+  postgres_data:
+  uploads_data:
+
+networks:
+  gameshop_network:
+    driver: bridge

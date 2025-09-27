@@ -1,0 +1,90 @@
+<div class="cart-container">
+  <div class="cart-header">
+    <h1 class="cart-title">Shopping Cart</h1>
+    <p class="cart-subtitle">Review your selected games</p>
+  </div>
+
+  <div class="cart-content" *ngIf="cart.items.length > 0; else emptyCart">
+    <div class="cart-items">
+      <app-cart-item 
+        *ngFor="let item of cart.items" 
+        [item]="item"
+        (remove)="removeFromCart($event)">
+      </app-cart-item>
+    </div>
+
+    <div class="cart-summary">
+      <div class="summary-card">
+        <h3 class="summary-title">Order Summary</h3>
+        
+        <div class="discount-section">
+          <label for="discountCode">Discount Code:</label>
+          <div class="discount-input-group">
+            <input type="text" 
+                   id="discountCode"
+                   [(ngModel)]="discountCode"
+                   placeholder="Enter discount code"
+                   class="discount-input">
+            <button class="apply-discount-btn" 
+                    (click)="applyDiscount()"
+                    [disabled]="!discountCode || applyingDiscount">
+              {{applyingDiscount ? 'Applying...' : 'Apply'}}
+            </button>
+          </div>
+          <div class="discount-message" *ngIf="discountMessage">
+            {{discountMessage}}
+          </div>
+        </div>
+
+        <div class="summary-details">
+          <div class="summary-row">
+            <span>Subtotal:</span>
+            <span>{{formatPrice(subtotal)}}</span>
+          </div>
+          <div class="summary-row" *ngIf="cart.discountAmount && cart.discountAmount > 0">
+            <span>Discount ({{cart.discountCode}}):</span>
+            <span class="discount-amount">-{{formatPrice(cart.discountAmount)}}</span>
+          </div>
+          <div class="summary-row total-row">
+            <span>Total:</span>
+            <span class="total-amount">{{formatPrice(cart.total)}}</span>
+          </div>
+        </div>
+
+        <div class="wallet-info">
+          <div class="wallet-balance">
+            <span>Wallet Balance:</span>
+            <span [class.insufficient]="walletBalance < cart.total">
+              {{formatPrice(walletBalance)}}
+            </span>
+          </div>
+          <div class="balance-warning" *ngIf="walletBalance < cart.total">
+            Insufficient balance. Please top up your wallet.
+          </div>
+        </div>
+
+        <div class="checkout-actions">
+          <button class="checkout-btn" 
+                  (click)="checkout()"
+                  [disabled]="walletBalance < cart.total || checkingOut">
+            {{checkingOut ? 'Processing...' : 'Checkout'}}
+          </button>
+          <button class="clear-cart-btn" (click)="clearCart()">
+            Clear Cart
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #emptyCart>
+    <div class="empty-cart">
+      <div class="empty-cart-icon"></div>
+      <h2>Your cart is empty</h2>
+      <p>Browse our store to find amazing games!</p>
+      <button class="browse-btn" (click)="navigateToStore()">
+        Browse Store
+      </button>
+    </div>
+  </ng-template>
+</div>

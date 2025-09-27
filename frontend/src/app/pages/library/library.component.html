@@ -1,0 +1,93 @@
+<div class="library-container">
+  <div class="library-header">
+    <h1 class="library-title">My Game Library</h1>
+    <p class="library-subtitle">Your purchased games</p>
+  </div>
+
+  <div class="library-content" *ngIf="games.length > 0; else emptyLibrary">
+    <div class="games-grid">
+      <div class="library-game-card" *ngFor="let game of games">
+        <div class="game-image">
+          <img [src]="game.image || '/assets/default-game.jpg'" 
+               [alt]="game.name"
+               onerror="this.src='/assets/default-game.jpg'">
+        </div>
+        
+        <div class="game-info">
+          <h3 class="game-title">{{game.name}}</h3>
+          <p class="game-type">{{game.type}}</p>
+          <p class="game-description">{{truncateText(game.description, 120)}}</p>
+          
+          <div class="game-meta">
+            <span class="purchase-date">
+              Purchased: {{formatDate(game.purchaseDate!)}}
+            </span>
+            <span class="game-price">{{formatPrice(game.price)}}</span>
+          </div>
+          
+          <div class="game-actions">
+            <button class="play-btn">
+              Play Now
+            </button>
+            <button class="details-btn" (click)="showGameDetails(game)">
+              Details
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #emptyLibrary>
+    <div class="empty-library">
+      <div class="empty-library-icon"></div>
+      <h2>Your library is empty</h2>
+      <p>Purchase games from our store to build your collection!</p>
+      <button class="browse-btn" (click)="navigateToStore()">
+        Browse Store
+      </button>
+    </div>
+  </ng-template>
+
+  <!-- Game Detail Modal -->
+  <div class="game-detail-overlay" *ngIf="selectedGame" (click)="closeGameDetail()">
+    <div class="game-detail-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{selectedGame.name}}</h2>
+        <button class="close-btn" (click)="closeGameDetail()">×</button>
+      </div>
+      
+      <div class="modal-content">
+        <div class="game-image-large">
+          <img [src]="selectedGame.image || '/assets/default-game.jpg'" 
+               [alt]="selectedGame.name"
+               onerror="this.src='/assets/default-game.jpg'">
+        </div>
+        
+        <div class="game-details">
+          <div class="detail-row">
+            <span class="label">Type:</span>
+            <span class="value">{{selectedGame.type}}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Price Paid:</span>
+            <span class="value">{{formatPrice(selectedGame.price)}}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Purchase Date:</span>
+            <span class="value">{{formatDate(selectedGame.purchaseDate!)}}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Release Date:</span>
+            <span class="value">{{formatDate(selectedGame.releaseDate!)}}</span>
+          </div>
+        </div>
+        
+        <div class="game-description-full" *ngIf="selectedGame.description">
+          <h4>About this game</h4>
+          <p>{{selectedGame.description}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

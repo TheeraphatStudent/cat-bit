@@ -1,0 +1,263 @@
+<div class="admin-container">
+  <div class="admin-header">
+    <h1 class="admin-title">Admin Dashboard</h1>
+    <p class="admin-subtitle">Manage games, users, and system settings</p>
+  </div>
+
+  <div class="dashboard-stats">
+    <div class="stat-card">
+      <div class="stat-icon users-icon"></div>
+      <div class="stat-info">
+        <h3>{{stats.totalUsers}}</h3>
+        <p>Total Users</p>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon games-icon"></div>
+      <div class="stat-info">
+        <h3>{{stats.totalGames}}</h3>
+        <p>Total Games</p>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon sales-icon"></div>
+      <div class="stat-info">
+        <h3>{{stats.totalSales}}</h3>
+        <p>Total Sales</p>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon revenue-icon"></div>
+      <div class="stat-info">
+        <h3>{{formatPrice(stats.totalRevenue)}}</h3>
+        <p>Total Revenue</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-tabs">
+    <button class="tab-btn" 
+            [class.active]="activeTab === 'games'"
+            (click)="setActiveTab('games')">
+      Games Management
+    </button>
+    <button class="tab-btn" 
+            [class.active]="activeTab === 'users'"
+            (click)="setActiveTab('users')">
+      Users Management
+    </button>
+    <button class="tab-btn" 
+            [class.active]="activeTab === 'discounts'"
+            (click)="setActiveTab('discounts')">
+      Discount Codes
+    </button>
+  </div>
+
+  <!-- Games Management Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'games'">
+    <div class="section-header">
+      <h2>Games Management</h2>
+      <button class="add-btn" (click)="showAddGameModal()">
+        Add New Game
+      </button>
+    </div>
+    
+    <div class="games-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Price</th>
+            <th>Sales</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let game of games">
+            <td>
+              <img [src]="game.image || '/assets/default-game.jpg'" 
+                   [alt]="game.name"
+                   class="game-thumbnail"
+                   onerror="this.src='/assets/default-game.jpg'">
+            </td>
+            <td>{{game.name}}</td>
+            <td>{{game.type}}</td>
+            <td>{{formatPrice(game.price)}}</td>
+            <td>{{game.salesCount}}</td>
+            <td>
+              <div class="action-buttons">
+                <button class="edit-btn" (click)="editGame(game)">Edit</button>
+                <button class="delete-btn" (click)="deleteGame(game)">Delete</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Users Management Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'users'">
+    <div class="section-header">
+      <h2>Users Management</h2>
+    </div>
+    
+    <div class="users-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Wallet Balance</th>
+            <th>Join Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users">
+            <td>{{user.username}}</td>
+            <td>{{user.email}}</td>
+            <td>
+              <span class="role-badge" [class.admin]="user.role === 'admin'">
+                {{user.role}}
+              </span>
+            </td>
+            <td>{{formatPrice(user.walletBalance || 0)}}</td>
+            <td>{{formatDate(user.createdAt!)}}</td>
+            <td>
+              <div class="action-buttons">
+                <button class="role-btn" (click)="toggleUserRole(user)">
+                  {{user.role === 'admin' ? 'Make User' : 'Make Admin'}}
+                </button>
+                <button class="delete-btn" (click)="deleteUser(user)">Delete</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Discount Codes Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'discounts'">
+    <div class="section-header">
+      <h2>Discount Codes</h2>
+      <button class="add-btn" (click)="showAddDiscountModal()">
+        Add New Code
+      </button>
+    </div>
+    
+    <div class="discounts-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Discount %</th>
+            <th>Max Usage</th>
+            <th>Used Count</th>
+            <th>Expire Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let discount of discountCodes">
+            <td><code>{{discount.code}}</code></td>
+            <td>{{discount.discountValue}}%</td>
+            <td>{{discount.maxUsage}}</td>
+            <td>{{discount.usedCount}}</td>
+            <td>{{discount.expireDate ? formatDate(discount.expireDate) : 'Never'}}</td>
+            <td>
+              <div class="action-buttons">
+                <button class="edit-btn" (click)="editDiscount(discount)">Edit</button>
+                <button class="delete-btn" (click)="deleteDiscount(discount)">Delete</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Add/Edit Game Modal -->
+  <div class="modal-overlay" *ngIf="showGameModal" (click)="closeGameModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{editingGame ? 'Edit Game' : 'Add New Game'}}</h3>
+        <button class="close-btn" (click)="closeGameModal()">×</button>
+      </div>
+      <form [formGroup]="gameForm" (ngSubmit)="saveGame()" class="modal-form">
+        <div class="form-group">
+          <label for="gameName">Game Name</label>
+          <input type="text" id="gameName" formControlName="name">
+        </div>
+        <div class="form-group">
+          <label for="gamePrice">Price</label>
+          <input type="number" id="gamePrice" formControlName="price" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="gameType">Type</label>
+          <select id="gameType" formControlName="type">
+            <option value="Action">Action</option>
+            <option value="Adventure">Adventure</option>
+            <option value="RPG">RPG</option>
+            <option value="Strategy">Strategy</option>
+            <option value="Sports">Sports</option>
+            <option value="Racing">Racing</option>
+            <option value="Puzzle">Puzzle</option>
+            <option value="Simulation">Simulation</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="gameDescription">Description</label>
+          <textarea id="gameDescription" formControlName="description" rows="3"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" (click)="closeGameModal()">Cancel</button>
+          <button type="submit" class="save-btn" [disabled]="gameForm.invalid || saving">
+            {{saving ? 'Saving...' : 'Save Game'}}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add/Edit Discount Modal -->
+  <div class="modal-overlay" *ngIf="showDiscountModal" (click)="closeDiscountModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{editingDiscount ? 'Edit Discount Code' : 'Add New Discount Code'}}</h3>
+        <button class="close-btn" (click)="closeDiscountModal()">×</button>
+      </div>
+      <form [formGroup]="discountForm" (ngSubmit)="saveDiscount()" class="modal-form">
+        <div class="form-group">
+          <label for="discountCode">Code</label>
+          <input type="text" id="discountCode" formControlName="code">
+        </div>
+        <div class="form-group">
+          <label for="discountValue">Discount Percentage</label>
+          <input type="number" id="discountValue" formControlName="discountValue" min="1" max="100">
+        </div>
+        <div class="form-group">
+          <label for="maxUsage">Maximum Usage</label>
+          <input type="number" id="maxUsage" formControlName="maxUsage" min="1">
+        </div>
+        <div class="form-group">
+          <label for="expireDate">Expire Date (Optional)</label>
+          <input type="date" id="expireDate" formControlName="expireDate">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" (click)="closeDiscountModal()">Cancel</button>
+          <button type="submit" class="save-btn" [disabled]="discountForm.invalid || saving">
+            {{saving ? 'Saving...' : 'Save Code'}}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

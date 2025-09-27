@@ -1,0 +1,117 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <h1 class="profile-title">My Profile</h1>
+    <p class="profile-subtitle">Manage your account and wallet</p>
+  </div>
+
+  <div class="profile-content">
+    <div class="profile-section">
+      <div class="user-info-card">
+        <div class="user-avatar">
+          <img [src]="currentUser?.profileImage || '/assets/default-avatar.jpg'" 
+               [alt]="currentUser?.username"
+               onerror="this.src='/assets/default-avatar.jpg'">
+          <button class="change-avatar-btn" (click)="triggerFileUpload()">
+            Change Photo
+          </button>
+          <input type="file" 
+                 #fileInput 
+                 (change)="onFileSelected($event)"
+                 accept="image/*"
+                 style="display: none;">
+        </div>
+        
+        <div class="user-details">
+          <h2>{{currentUser?.username}}</h2>
+          <p class="user-email">{{currentUser?.email}}</p>
+          <span class="user-role" [class.admin]="currentUser?.role === 'admin'">
+            {{currentUser?.role === 'admin' ? 'Administrator' : 'User'}}
+          </span>
+        </div>
+      </div>
+
+      <div class="edit-profile-card">
+        <h3>Edit Profile</h3>
+        <form [formGroup]="profileForm" (ngSubmit)="updateProfile()" class="profile-form">
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" 
+                   id="username" 
+                   formControlName="username"
+                   [class.error]="profileForm.get('username')?.invalid && profileForm.get('username')?.touched">
+            <div class="error-message" 
+                 *ngIf="profileForm.get('username')?.invalid && profileForm.get('username')?.touched">
+              <span *ngIf="profileForm.get('username')?.errors?.['required']">Username is required</span>
+              <span *ngIf="profileForm.get('username')?.errors?.['invalidUsername']">
+                Username must be 3-20 characters, letters, numbers, and underscores only
+              </span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" 
+                   id="email" 
+                   formControlName="email"
+                   [class.error]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched">
+            <div class="error-message" 
+                 *ngIf="profileForm.get('email')?.invalid && profileForm.get('email')?.touched">
+              <span *ngIf="profileForm.get('email')?.errors?.['required']">Email is required</span>
+              <span *ngIf="profileForm.get('email')?.errors?.['invalidEmail']">Please enter a valid email</span>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" 
+                    class="update-btn" 
+                    [disabled]="profileForm.invalid || updating">
+              {{updating ? 'Updating...' : 'Update Profile'}}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="wallet-section">
+      <app-wallet-balance 
+        [balance]="walletBalance"
+        [loading]="toppingUp"
+        (topUp)="onTopUp($event)">
+      </app-wallet-balance>
+      
+      <app-transaction-history 
+        [transactions]="transactions">
+      </app-transaction-history>
+    </div>
+  </div>
+
+  <div class="danger-zone">
+    <div class="danger-card">
+      <h3>Danger Zone</h3>
+      <p>Once you delete your account, there is no going back. Please be certain.</p>
+      <button class="delete-account-btn" (click)="confirmDeleteAccount()">
+        Delete Account
+      </button>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-overlay" *ngIf="showDeleteModal" (click)="cancelDelete()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Delete Account</h3>
+        <button class="close-btn" (click)="cancelDelete()">×</button>
+      </div>
+      <div class="modal-content">
+        <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+        <p><strong>All your data, including purchased games, will be permanently lost.</strong></p>
+      </div>
+      <div class="modal-actions">
+        <button class="cancel-btn" (click)="cancelDelete()">Cancel</button>
+        <button class="confirm-delete-btn" (click)="deleteAccount()" [disabled]="deleting">
+          {{deleting ? 'Deleting...' : 'Delete Account'}}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

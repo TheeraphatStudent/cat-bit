@@ -1,0 +1,51 @@
+<div class="game-detail" *ngIf="game">
+  <div class="game-header">
+    <div class="game-image-large">
+      <img [src]="game.image || '/assets/default-game.jpg'" 
+           [alt]="game.name"
+           onerror="this.src='/assets/default-game.jpg'">
+      <div class="game-rank" *ngIf="game.rank">
+        Rank #{{game.rank}}
+      </div>
+    </div>
+    
+    <div class="game-info-large">
+      <h1 class="game-title-large">{{game.name}}</h1>
+      <p class="game-type-large">{{game.type}}</p>
+      
+      <div class="game-stats">
+        <div class="stat-item" *ngIf="game.releaseDate">
+          <span class="stat-label">Release Date:</span>
+          <span class="stat-value">{{formatDate(game.releaseDate)}}</span>
+        </div>
+        <div class="stat-item" *ngIf="game.salesCount">
+          <span class="stat-label">Sales:</span>
+          <span class="stat-value">{{formatNumber(game.salesCount)}} copies</span>
+        </div>
+      </div>
+      
+      <div class="price-section">
+        <span class="game-price-large">{{formatPrice(game.price)}}</span>
+        <div class="action-buttons">
+          <button class="btn-primary" 
+                  (click)="onAddToCart()" 
+                  [disabled]="inCart || owned"
+                  *ngIf="!owned">
+            {{inCart ? 'In Cart' : 'Add to Cart'}}
+          </button>
+          <button class="btn-owned" *ngIf="owned" disabled>
+            Owned
+          </button>
+          <button class="btn-secondary" (click)="onClose()">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="game-description-section" *ngIf="game.description">
+    <h3>About this game</h3>
+    <p class="game-description-full">{{game.description}}</p>
+  </div>
+</div>
