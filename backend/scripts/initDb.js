@@ -74,14 +74,14 @@ const initializeDatabase = async () => {
       INSERT INTO users (username, email, password, role, wallet_balance) 
       VALUES ($1, $2, $3, $4, $5)
       ON CONFLICT (email) DO NOTHING
-    `, ['admin', 'admin@gameshop.com', '$2a$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW', 'admin', 1000]);
+    `, ['admin', 'admin@catbit.com', '$2a$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW', 'admin', 1000]);
 
     // Insert sample regular user (password: user123)
     await pool.query(`
       INSERT INTO users (username, email, password, role, wallet_balance) 
       VALUES ($1, $2, $3, $4, $5)
       ON CONFLICT (email) DO NOTHING
-    `, ['testuser', 'user@gameshop.com', '$2a$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW', 'user', 500]);
+    `, ['testuser', 'user@catbit.com', '$2a$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW', 'user', 500]);
 
     // Insert sample games
     const sampleGames = [
@@ -117,8 +117,8 @@ const initializeDatabase = async () => {
 
     console.log('Database initialized successfully!');
     console.log('Sample users created:');
-    console.log('Admin: admin@gameshop.com / admin123');
-    console.log('User: user@gameshop.com / user123');
+    console.log('Admin: admin@catbit.com / admin123');
+    console.log('User: user@catbit.com / user123');
     
     process.exit(0);
   } catch (error) {

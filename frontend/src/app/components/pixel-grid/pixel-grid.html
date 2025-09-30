@@ -1,0 +1,12 @@
+<div id="d-overlay">
+  <div class="d-wrap" 
+       [style.gridTemplateColumns]="'repeat(' + cols + ', 72px)'"
+       [style.gridTemplateRows]="'repeat(' + rows + ', 72px)'">
+       
+    <div class="d"
+         *ngFor="let pixel of pixels"
+         [style.animationDelay]="pixel.delay"
+         [style.background]="pixel.color">
+    </div>
+  </div>
+</div>

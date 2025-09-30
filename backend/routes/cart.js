@@ -14,12 +14,12 @@ router.get('/', authMiddleware, async (req, res) => {
       SELECT g.*, 1 as quantity
       FROM games g
       WHERE g.id = ANY(
-        SELECT unnest(string_to_array(
-          COALESCE(
-            (SELECT cart_items FROM user_sessions WHERE user_id = $1),
-            ''
-          ), ','
-        ))::int[]
+        COALESCE(
+          (SELECT string_to_array(cart_items, ',')::int[]
+           FROM user_sessions 
+           WHERE user_id = $1 AND cart_items IS NOT NULL),
+          ARRAY[]::int[]
+        )
       )
     `, [userId]);
 
@@ -68,15 +68,6 @@ router.post('/add', authMiddleware, async (req, res) => {
       return res.status(400).json({ message: 'You already own this game' });
     }
 
-    // Create session table if it doesn't exist and add to cart
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS user_sessions (
-        user_id INT PRIMARY KEY,
-        cart_items TEXT,
-        discount_code VARCHAR(50)
-      )
-    `);
-
     await pool.query(`
       INSERT INTO user_sessions (user_id, cart_items) 
       VALUES ($1, $2)
@@ -94,12 +85,12 @@ router.post('/add', authMiddleware, async (req, res) => {
       SELECT g.*, 1 as quantity
       FROM games g
       WHERE g.id = ANY(
-        SELECT unnest(string_to_array(
-          COALESCE(
-            (SELECT cart_items FROM user_sessions WHERE user_id = $1),
-            ''
-          ), ','
-        ))::int[]
+        COALESCE(
+          (SELECT array_agg((unnest(string_to_array(cart_items, ','))::int))
+           FROM user_sessions 
+           WHERE user_id = $1 AND cart_items IS NOT NULL),
+          ARRAY[]::int[]
+        )
       )
     `, [userId]);
 
@@ -145,12 +136,12 @@ router.delete('/remove/:gameId', authMiddleware, async (req, res) => {
       SELECT g.*, 1 as quantity
       FROM games g
       WHERE g.id = ANY(
-        SELECT unnest(string_to_array(
-          COALESCE(
-            (SELECT cart_items FROM user_sessions WHERE user_id = $1 AND cart_items != ''),
-            ''
-          ), ','
-        ))::int[]
+        COALESCE(
+          (SELECT array_agg((unnest(string_to_array(cart_items, ','))::int))
+           FROM user_sessions 
+           WHERE user_id = $1 AND cart_items IS NOT NULL),
+          ARRAY[]::int[]
+        )
       )
     `, [userId]);
 
@@ -183,7 +174,6 @@ router.post('/discount', authMiddleware, async (req, res) => {
       return res.status(400).json({ message: 'Discount code is required' });
     }
 
-    // Check if discount code exists and is valid
     const discountResult = await pool.query(
       'SELECT * FROM discount_codes WHERE code = $1 AND (expire_date IS NULL OR expire_date > NOW()) AND used_count < max_usage',
       [code]
@@ -195,7 +185,6 @@ router.post('/discount', authMiddleware, async (req, res) => {
 
     const discount = discountResult.rows[0];
 
-    // Store discount code in session
     await pool.query(
       'UPDATE user_sessions SET discount_code = $1 WHERE user_id = $2',
       [code, userId]
@@ -206,12 +195,12 @@ router.post('/discount', authMiddleware, async (req, res) => {
       SELECT g.*, 1 as quantity
       FROM games g
       WHERE g.id = ANY(
-        SELECT unnest(string_to_array(
-          COALESCE(
-            (SELECT cart_items FROM user_sessions WHERE user_id = $1),
-            ''
-          ), ','
-        ))::int[]
+        COALESCE(
+          (SELECT array_agg((unnest(string_to_array(cart_items, ','))::int))
+           FROM user_sessions 
+           WHERE user_id = $1 AND cart_items IS NOT NULL),
+          ARRAY[]::int[]
+        )
       )
     `, [userId]);
 

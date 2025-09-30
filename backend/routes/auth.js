@@ -11,29 +11,32 @@ router.post('/register', async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
-    // Validation
-    if (!username || !email || !password) {
+    const trimmedUsername = username?.trim();
+    const trimmedEmail = email?.trim();
+    const trimmedPassword = password?.trim();
+
+    if (!trimmedUsername || !trimmedEmail || !trimmedPassword) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
-    // Check if user already exists
     const existingUser = await pool.query(
       'SELECT id FROM users WHERE email = $1 OR username = $2',
-      [email, username]
+      [trimmedEmail, trimmedUsername]
     );
 
     if (existingUser.rows.length > 0) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Hash password
     const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const hashedPassword = await bcrypt.hash(trimmedPassword, saltRounds);
 
-    // Create user
+    console.log('Registration - Password length:', trimmedPassword.length);
+    console.log('Registration - Hash length:', hashedPassword.length);
+
     const newUser = await pool.query(
       'INSERT INTO users (username, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id, username, email, role',
-      [username, email, hashedPassword, 'user']
+      [trimmedUsername, trimmedEmail, hashedPassword, 'user']
     );
 
     res.status(201).json({
@@ -51,25 +54,41 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
+    // Trim whitespace from inputs
+    const trimmedEmail = email?.trim();
+    const trimmedPassword = password?.trim();
+
+    if (!trimmedEmail || !trimmedPassword) {
       return res.status(400).json({ message: 'Email and password are required' });
     }
+
+    console.log('Login attempt - Email:', trimmedEmail);
+    console.log('Login attempt - Password length:', trimmedPassword.length);
 
     // Get user
     const userResult = await pool.query(
       'SELECT id, username, email, password, role, profile_image, wallet_balance FROM users WHERE email = $1',
-      [email]
+      [trimmedEmail]
     );
 
     if (userResult.rows.length === 0) {
+      console.log('Login failed - User not found');
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
     const user = userResult.rows[0];
-
+    console.log('Login - Found user:', user.email);
+    console.log('Login - Stored hash length:', user.password.length);
+    console.log('Login - Actual password:', user.password);
+    console.log("Login - Password to compare length:", trimmedPassword.length);
+    console.log('Login - Actual input password:', trimmedPassword);
+    
     // Check password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(trimmedPassword, user.password);
+    console.log('Login - Password valid:', isPasswordValid);
+    
     if (!isPasswordValid) {
+      console.log('Login failed - Invalid password');
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
@@ -82,6 +101,8 @@ router.post('/login', async (req, res) => {
 
     // Remove password from response
     delete user.password;
+
+    console.log('Login successful for user:', user.email);
 
     res.json({
       message: 'Login successful',

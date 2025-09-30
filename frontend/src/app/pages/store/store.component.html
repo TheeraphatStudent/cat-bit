@@ -1,0 +1,106 @@
+<div class="store-container">
+
+  <div class="store-header pixel-corners-2">
+    <h1 class="store-title">Cat bit Store</h1>
+    <p class="store-subtitle">Discover and purchase amazing games</p>
+    <div class="filters-section pixel-corners-2">
+      <!-- Main Search Bar -->
+      <div class="search-filter">
+        <div class="input-wrapper">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          <input type="text" 
+                 [(ngModel)]="filter.name" 
+                 (ngModelChange)="onFilterChange()"
+                 placeholder="Search for games..."
+                 class="search-input">
+        </div>
+      </div>
+      
+      <!-- Filter Controls -->
+      <div class="filter-controls">
+        <div class="type-filter">
+          <label class="filter-label">
+            <svg class="filter-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+            Genre
+          </label>
+          <select [(ngModel)]="filter.type" 
+                  (ngModelChange)="onFilterChange()"
+                  class="filter-select">
+            <option value="">All Genres</option>
+            <option value="Action">Action</option>
+            <option value="Adventure">Adventure</option>
+            <option value="RPG">RPG</option>
+            <option value="Strategy">Strategy</option>
+            <option value="Sports">Sports</option>
+            <option value="Racing">Racing</option>
+            <option value="Puzzle">Puzzle</option>
+            <option value="Simulation">Simulation</option>
+          </select>
+        </div>
+    
+        <div class="price-filter">
+          <label class="filter-label">
+            <svg class="filter-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23"></line>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+            Price Range
+          </label>
+          <div class="price-inputs">
+            <input type="number" 
+                   [(ngModel)]="filter.minPrice" 
+                   (ngModelChange)="onFilterChange()"
+                   placeholder="Min"
+                   class="price-input"
+                   min="0">
+            <span class="price-separator">—</span>
+            <input type="number" 
+                   [(ngModel)]="filter.maxPrice" 
+                   (ngModelChange)="onFilterChange()"
+                   placeholder="Max"
+                   class="price-input"
+                   min="0">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="games-grid pixel-corners-2" *ngIf="!selectedGame && !loading">
+    <app-game-card 
+      *ngFor="let game of games" 
+      [game]="game"
+      [inCart]="isInCart(game.id!)"
+      [owned]="isOwned(game.id!)"
+      (cardClick)="selectGame(game)"
+      (addToCart)="addToCart(game)">
+    </app-game-card>
+  </div>
+
+  <div class="loading" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Loading games...</p>
+  </div>
+
+  <div class="no-games" *ngIf="!loading && games.length === 0">
+    <p>No games found matching your criteria.</p>
+  </div>
+
+  <div class="game-detail-overlay" *ngIf="selectedGame" (click)="closeGameDetail()">
+    <div class="game-detail-container pixel-border" (click)="$event.stopPropagation()">
+      <app-game-detail 
+        [game]="selectedGame"
+        [inCart]="isInCart(selectedGame.id!)"
+        [owned]="isOwned(selectedGame.id!)"
+        (addToCart)="addToCart($event)"
+        (close)="closeGameDetail()">
+      </app-game-detail>
+    </div>
+  </div>
+</div>

@@ -1,8 +1,10 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { Game } from '../../models/game.model';
 import { PriceFormat } from '../../utils/price-format';
 import { DateFormat } from '../../utils/date-format';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-game-card',
@@ -17,6 +19,11 @@ export class GameCardComponent {
   @Input() owned: boolean = false;
   @Output() cardClick = new EventEmitter<Game>();
   @Output() addToCart = new EventEmitter<Game>();
+
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   formatPrice(price: number): string {
     return PriceFormat.formatCurrency(price);
@@ -41,6 +48,16 @@ export class GameCardComponent {
 
   onAddToCart(event: Event): void {
     event.stopPropagation();
+    
+    if (!this.isAuthenticated()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+    
     this.addToCart.emit(this.game);
+  }
+
+  isAuthenticated(): boolean {
+    return this.authService.isAuthenticated();
   }
 }

@@ -1,6 +1,6 @@
 .game-card {
   background: var(--color-surface);
-  border-radius: var(--radius-lg);
+  /* border-radius: var(--radius-lg); */
   box-shadow: var(--shadow-md);
   overflow: hidden;
   transition: all var(--transition-base);
@@ -34,14 +34,15 @@
 
 .game-rank {
   position: absolute;
-  top: var(--space-sm);
-  right: var(--space-sm);
+  top: var(--space-md);
+  right: var(--space-md);
   background: var(--gradient-primary-135);
   color: white;
-  padding: var(--space-xs) var(--space-sm);
-  border-radius: var(--radius-lg);
+  padding: var(--space-xs) var(--space-md);
+  /* border-radius: var(--radius-lg); */
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
+  box-shadow: var(--shadow-md);
 }
 
 .game-info {
@@ -52,7 +53,7 @@
 }
 
 .game-title {
-  margin: 0 0 var(--space-sm) 0;
+  margin: 0 0 var(--space-md) 0;
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
@@ -60,7 +61,7 @@
 }
 
 .game-type {
-  margin: 0 0 var(--space-sm) 0;
+  margin: 0 0 var(--space-md) 0;
   color: var(--color-primary-2);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
@@ -69,7 +70,7 @@
 }
 
 .game-description {
-  margin: 0 0 var(--space-sm) 0;
+  margin: 0 0 var(--space-md) 0;
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   line-height: 1.5;
@@ -79,7 +80,7 @@
 .game-meta {
   display: flex;
   justify-content: space-between;
-  margin-bottom: var(--space-sm);
+  margin-bottom: var(--space-md);
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }
@@ -97,10 +98,10 @@
   color: var(--color-text-primary);
 }
 
-.btn-add-cart, .btn-owned {
-  padding: var(--space-sm) var(--space-md);
+.btn-add-cart, .btn-owned, .btn-login {
+  padding: var(--space-md) var(--space-md);
   border: none;
-  border-radius: var(--radius-md);
+  /* border-radius: var(--radius-md); */
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
@@ -121,6 +122,34 @@
   background: var(--color-border);
   color: var(--color-text-muted);
   cursor: not-allowed;
+}
+
+.btn-login {
+  background: var(--color-info);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-login::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn-login:hover::before {
+  left: 100%;
+}
+
+.btn-login:hover {
+  background: #3182ce;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
 }
 
 .btn-owned {
