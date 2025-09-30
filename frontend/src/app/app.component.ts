@@ -5,11 +5,13 @@ import { AuthService } from './services/auth.service';
 import { CartService } from './services/cart.service';
 import { SoundService } from './services/sound.service';
 import { filter } from 'rxjs/operators';
+import { PixelGrid } from './components/pixel-grid/pixel-grid';
+import { ParticleDirective } from './interceptors/partical/partical';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet],
+  imports: [CommonModule, RouterOutlet, PixelGrid],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
@@ -35,6 +37,8 @@ export class AppComponent implements OnInit {
       this.currentRoute = event.url;
       this.showNavbar = !this.noNavbarRoutes.includes(event.url);
     });
+
+
   }
 
   ngOnInit(): void {
@@ -66,5 +70,6 @@ export class AppComponent implements OnInit {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event): void {
     this.soundService.playClick();
+    this.soundService.enableBackgroundMusic();
   }
 }
