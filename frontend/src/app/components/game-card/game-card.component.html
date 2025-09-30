@@ -1,9 +1,9 @@
-<div class="game-card" (click)="onCardClick()">
-  <div class="game-image">
+<div class="game-card pixel-border" (click)="onCardClick()">
+  <div class="game-image pixel-border">
     <img [src]="game.image || '/assets/default-game.jpg'" 
          [alt]="game.name" 
          onerror="this.src='/assets/default-game.jpg'">
-    <div class="game-rank" *ngIf="game.rank">
+    <div class="game-rank pixel-corners-3" *ngIf="game.rank">
       #{{game.rank}}
     </div>
   </div>
@@ -24,7 +24,7 @@
     
     <div class="game-footer">
       <span class="game-price">{{formatPrice(game.price)}}</span>
-      <div class="card-actions">
+      <div class="card-actions pixel-corners-2">
         <button class="btn-add-cart" 
                 (click)="onAddToCart($event)" 
                 [disabled]="inCart"

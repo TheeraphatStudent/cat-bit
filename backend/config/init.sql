@@ -54,12 +54,12 @@ CREATE TABLE IF NOT EXISTS discount_codes (
 
 -- Insert sample admin user (password: admin123)
 INSERT INTO users (username, email, password, role, wallet_balance)
-VALUES ('admin', 'admin@gameshop.com', '$2a$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW', 'admin', 1000)
+VALUES ('admin', 'admin@catbit.com', '$2a$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW', 'admin', 1000)
 ON CONFLICT (email) DO NOTHING;
 
 -- Insert sample regular user (password: user123)
 INSERT INTO users (username, email, password, role, wallet_balance)
-VALUES ('testuser', 'user@gameshop.com', '$2a$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW', 'user', 500)
+VALUES ('testuser', 'user@catbit.com', '$2a$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW', 'user', 500)
 ON CONFLICT (email) DO NOTHING;
 
 -- Insert sample games

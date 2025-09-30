@@ -5,6 +5,7 @@ import { tap } from 'rxjs/operators';
 import { Cart, CartItem, CheckoutRequest } from '../models/cart.model';
 import { Game } from '../models/game.model';
 import { environment } from '../../environments/environment';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,12 +15,24 @@ export class CartService {
   private cartSubject = new BehaviorSubject<Cart>({ items: [], total: 0 });
   public cart$ = this.cartSubject.asObservable();
 
-  constructor(private http: HttpClient) {
-    this.loadCart();
+  constructor(private http: HttpClient, private authService: AuthService) {
+    this.authService.currentUser$.subscribe(user => {
+      if (user) {
+        this.loadCart();
+      } else {
+        this.cartSubject.next({ items: [], total: 0, discountCode: undefined, discountAmount: 0 });
+      }
+    });
   }
 
   private loadCart(): void {
-    this.getCart().subscribe(cart => this.cartSubject.next(cart));
+    this.getCart().subscribe({
+      next: cart => this.cartSubject.next(cart),
+      error: () => {
+        // If loading fails (e.g., not authenticated), reset cart
+        this.cartSubject.next({ items: [], total: 0, discountCode: undefined, discountAmount: 0 });
+      }
+    });
   }
 
   getCart(): Observable<Cart> {

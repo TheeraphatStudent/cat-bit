@@ -14,7 +14,7 @@ import { CustomValidators } from '../../utils/validators';
       <div class="login-card">
         <div class="login-header">
           <h1 class="login-title">Welcome Back</h1>
-          <p class="login-subtitle">Sign in to your GameShop account</p>
+          <p class="login-subtitle">Sign in to your Cat bit account</p>
         </div>
 
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">

@@ -14,7 +14,7 @@ import { CustomValidators } from '../../utils/validators';
       <div class="register-card">
         <div class="register-header">
           <h1 class="register-title">Create Account</h1>
-          <p class="register-subtitle">Join GameShop and discover amazing games</p>
+          <p class="register-subtitle">Join Cat bit and discover amazing games</p>
         </div>
 
         <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">

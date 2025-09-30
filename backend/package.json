@@ -1,7 +1,7 @@
 {
-  "name": "gameshop-backend",
+  "name": "catbit-backend",
   "version": "1.0.0",
-  "description": "GameShop Backend API",
+  "description": "Cat bit Backend API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

@@ -15,7 +15,7 @@ import { filter } from 'rxjs/operators';
       <nav class="navbar" *ngIf="showNavbar">
         <div class="nav-content">
           <div class="nav-brand">
-            <h1 class="brand-title" (click)="navigateHome()">GameShop</h1>
+            <h1 class="brand-title" (click)="navigateHome()">Cat bit</h1>
           </div>
 
           <div class="nav-links">

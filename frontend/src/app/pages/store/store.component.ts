@@ -15,7 +15,7 @@ import { Game, GameFilter } from '../../models/game.model';
   template: `
     <div class="store-container">
       <div class="store-header">
-        <h1 class="store-title">GameShop Store</h1>
+        <h1 class="store-title">Cat bit Store</h1>
         <p class="store-subtitle">Discover and purchase amazing games</p>
       </div>
 

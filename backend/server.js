@@ -38,5 +38,5 @@ app.use('*', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`GameShop Backend running on port ${PORT}`);
+  console.log(`Cat bit Backend running on port ${PORT}`);
 });
