@@ -25,12 +25,19 @@
     <div class="game-footer">
       <span class="game-price">{{formatPrice(game.price)}}</span>
       <div class="card-actions pixel-corners-2">
+        <button class="btn-login" 
+                (click)="onAddToCart($event)" 
+                *ngIf="!isAuthenticated() && !owned">
+          Login First
+        </button>
+        
         <button class="btn-add-cart" 
                 (click)="onAddToCart($event)" 
                 [disabled]="inCart"
-                *ngIf="!owned">
+                *ngIf="isAuthenticated() && !owned">
           {{inCart ? 'In Cart' : 'Add to Cart'}}
         </button>
+        
         <button class="btn-owned" *ngIf="owned" disabled>
           Owned
         </button>

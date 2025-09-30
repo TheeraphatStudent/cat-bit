@@ -84,13 +84,26 @@ export class StoreComponent implements OnInit {
   }
 
   addToCart(game: Game): void {
-    if (this.authService.isAuthenticated() && game.id) {
-      this.cartService.addToCart(game.id).subscribe({
-        next: () => {
-          this.loadCartItems();
-        }
-      });
+    if (!this.authService.isAuthenticated()) {
+      console.error('User not authenticated');
+      return;
     }
+
+    if (!game.id || isNaN(game.id)) {
+      console.error('Invalid game ID:', game.id);
+      return;
+    }
+
+    console.log('Adding game to cart:', game.id);
+    this.cartService.addToCart(game.id).subscribe({
+      next: (cart) => {
+        console.log('Game added to cart successfully', cart);
+        this.loadCartItems();
+      },
+      error: (error) => {
+        console.error('Error adding to cart:', error);
+      }
+    });
   }
 
   isInCart(gameId: number): boolean {

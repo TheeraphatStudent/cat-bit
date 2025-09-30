@@ -85,4 +85,32 @@ export class AppComponent implements OnInit {
       this.soundService.enableBackgroundMusic();
     }
   }
+
+  @HostListener('document:mouseover', ['$event'])
+  onDocumentMouseover(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    
+    if (target.dataset['hoverSoundPlayed']) {
+      return;
+    }
+    
+    if (target.tagName === 'BUTTON' || 
+        target.tagName === 'A' || 
+        target.tagName === 'SELECT' ||
+        target.tagName === 'OPTION' ||
+        target.tagName === 'INPUT' ||
+        target.classList.contains('nav-link') ||
+        target.classList.contains('game-card')) {
+      this.soundService.playHover();
+      target.dataset['hoverSoundPlayed'] = 'true';
+    }
+  }
+
+  @HostListener('document:mouseout', ['$event'])
+  onDocumentMouseout(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (target.dataset['hoverSoundPlayed']) {
+      delete target.dataset['hoverSoundPlayed'];
+    }
+  }
 }

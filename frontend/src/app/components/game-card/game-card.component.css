@@ -98,7 +98,7 @@
   color: var(--color-text-primary);
 }
 
-.btn-add-cart, .btn-owned {
+.btn-add-cart, .btn-owned, .btn-login {
   padding: var(--space-md) var(--space-md);
   border: none;
   /* border-radius: var(--radius-md); */
@@ -122,6 +122,34 @@
   background: var(--color-border);
   color: var(--color-text-muted);
   cursor: not-allowed;
+}
+
+.btn-login {
+  background: var(--color-info);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-login::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn-login:hover::before {
+  left: 100%;
+}
+
+.btn-login:hover {
+  background: #3182ce;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
 }
 
 .btn-owned {

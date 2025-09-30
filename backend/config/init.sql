@@ -12,6 +12,12 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS user_sessions (
+  user_id INT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  cart_items TEXT,
+  discount_code VARCHAR(50)
+);
+
 -- Create games table
 CREATE TABLE IF NOT EXISTS games (
   id SERIAL PRIMARY KEY,
