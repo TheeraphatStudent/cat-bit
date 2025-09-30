@@ -72,4 +72,17 @@ export class AppComponent implements OnInit {
     this.soundService.playClick();
     this.soundService.enableBackgroundMusic();
   }
+
+  @HostListener('document:keydown', ['$event'])
+  onDocumentKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Backspace' || event.key === 'Delete') {
+      this.soundService.playDelete();
+      this.soundService.enableBackgroundMusic();
+    }
+    
+    else if (/^[a-zA-Z0-9]$|^(Space|Enter|Tab)$/.test(event.key)) {
+      this.soundService.playTyping();
+      this.soundService.enableBackgroundMusic();
+    }
+  }
 }

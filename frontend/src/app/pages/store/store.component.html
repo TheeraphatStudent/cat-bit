@@ -93,7 +93,7 @@
   </div>
 
   <div class="game-detail-overlay" *ngIf="selectedGame" (click)="closeGameDetail()">
-    <div class="game-detail-container" (click)="$event.stopPropagation()">
+    <div class="game-detail-container pixel-border" (click)="$event.stopPropagation()">
       <app-game-detail 
         [game]="selectedGame"
         [inCart]="isInCart(selectedGame.id!)"

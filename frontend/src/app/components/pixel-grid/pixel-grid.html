@@ -5,7 +5,8 @@
        
     <div class="d"
          *ngFor="let pixel of pixels"
-         [style.animationDelay]="pixel.delay">
+         [style.animationDelay]="pixel.delay"
+         [style.background]="pixel.color">
     </div>
   </div>
 </div>
