@@ -8,9 +8,9 @@
     <div class="profile-section">
       <div class="user-info-card">
         <div class="user-avatar">
-          <img [src]="currentUser?.profileImage || '/assets/default-avatar.jpg'" 
+          <img [src]="currentUser?.profileImage || '/assets/images/logo.png'" 
                [alt]="currentUser?.username"
-               onerror="this.src='/assets/default-avatar.jpg'">
+               onerror="this.src='/assets/images/logo.png'">
           <button class="change-avatar-btn" (click)="triggerFileUpload()">
             Change Photo
           </button>
