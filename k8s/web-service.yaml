@@ -5,12 +5,14 @@ metadata:
     kompose.cmd: kompose convert -f docker-compose.yaml
     kompose.version: 1.37.0 (fb0539e64)
   labels:
-    io.kompose.service: web
-  name: web
+    io.kompose.service: catbit-web
+  name: catbit-web
 spec:
+  type: LoadBalancer
   ports:
-    - name: "4200"
-      port: 4200
-      targetPort: 4200
+    - name: "http"
+      port: 80
+      targetPort: 80
+      protocol: TCP
   selector:
-    io.kompose.service: web
+    app: catbit-web

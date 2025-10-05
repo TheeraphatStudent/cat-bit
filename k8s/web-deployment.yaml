@@ -5,13 +5,13 @@ metadata:
     kompose.cmd: kompose convert -f docker-compose.yaml
     kompose.version: 1.37.0 (fb0539e64)
   labels:
-    io.kompose.service: web
-  name: web
+    app: catbit-web
+  name: catbit-web
 spec:
   replicas: 1
   selector:
     matchLabels:
-      io.kompose.service: web
+      app: catbit-web
   strategy:
     type: Recreate
   template:
@@ -20,13 +20,13 @@ spec:
         kompose.cmd: kompose convert -f docker-compose.yaml
         kompose.version: 1.37.0 (fb0539e64)
       labels:
-        io.kompose.service: web
+        app: catbit-web
     spec:
       containers:
-        - image: cat-bit-web
-          imagePullPolicy: Never
+        - image: gcr.io/lottocat/catbit-frontend:latest
+          imagePullPolicy: Always
           name: catbit-web
           ports:
-            - containerPort: 4200
+            - containerPort: 80
               protocol: TCP
       restartPolicy: Always
