@@ -35,5 +35,6 @@ kubectl exec $(kubectl get pods -l io.kompose.service=db -o jsonpath='{.items[0]
 echo "Port forwarding..."
 kubectl port-forward service/web 4200:4200 &
 kubectl port-forward service/api 3000:3000 &
+kubectl port-forward service/db 5432:5432 &
 
 echo "Deployment complete. Access web at http://localhost:4200"
