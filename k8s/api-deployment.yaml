@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yaml
+    kompose.version: 1.37.0 (fb0539e64)
+  labels:
+    io.kompose.service: api
+  name: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: api
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yaml
+        kompose.version: 1.37.0 (fb0539e64)
+      labels:
+        io.kompose.service: api
+    spec:
+      containers:
+        - env:
+            - name: DB_HOST
+              value: db
+            - name: DB_NAME
+              value: catbit
+            - name: DB_PASSWORD
+              value: password
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_USER
+              value: postgres
+            - name: JWT_EXPIRES_IN
+              value: 7d
+            - name: JWT_SECRET
+              value: your_jwt_secret_key_here
+            - name: PORT
+              value: "3000"
+          image: api
+          name: catbit-api
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /app
+              name: api-cm0
+            - mountPath: /app/uploads
+              name: uploads-data
+      restartPolicy: Always
+      volumes:
+        - configMap:
+            name: api-cm0
+          name: api-cm0
+        - name: uploads-data
+          persistentVolumeClaim:
+            claimName: uploads-data

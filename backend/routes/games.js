@@ -22,36 +22,81 @@ const upload = multer({ storage: storage });
 router.get('/', async (req, res) => {
   try {
     const { name, type, minPrice, maxPrice } = req.query;
-    
-    let query = 'SELECT *, ROW_NUMBER() OVER (ORDER BY sales_count DESC, release_date DESC) as rank FROM games WHERE 1=1';
+
+    let query = `
+      SELECT
+        g.id,
+        g.name,
+        g.price,
+        g.type,
+        g.description,
+        g.image,
+        g.release_date AS "releaseDate",
+        COALESCE(g.sales_count, 0) AS "salesCount",
+        g.created_at AS "createdAt",
+        g.updated_at AS "updatedAt",
+        ROW_NUMBER() OVER (ORDER BY g.sales_count DESC, g.release_date DESC) AS "rank"
+      FROM games g
+      WHERE 1 = 1
+    `;
+
     const params = [];
 
     if (name) {
-      query += ' AND LOWER(name) LIKE LOWER($' + (params.length + 1) + ')';
+      query += ` AND LOWER(g.name) LIKE LOWER($${params.length + 1})`;
       params.push(`%${name}%`);
     }
 
     if (type) {
-      query += ' AND type = $' + (params.length + 1);
+      query += ` AND g.type = $${params.length + 1}`;
       params.push(type);
     }
 
     if (minPrice) {
-      query += ' AND price >= $' + (params.length + 1);
+      query += ` AND g.price >= $${params.length + 1}`;
       params.push(parseFloat(minPrice));
     }
 
     if (maxPrice) {
-      query += ' AND price <= $' + (params.length + 1);
+      query += ` AND g.price <= $${params.length + 1}`;
       params.push(parseFloat(maxPrice));
     }
 
-    query += ' ORDER BY sales_count DESC, release_date DESC';
+    query += ' ORDER BY g.sales_count DESC, g.release_date DESC';
 
     const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     console.error('Get games error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Get user's library (purchased games)
+router.get('/library', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const result = await pool.query(`
+      SELECT
+        g.id,
+        g.name,
+        g.price,
+        g.type,
+        g.description,
+        g.image,
+        g.release_date AS "releaseDate",
+        COALESCE(g.sales_count, 0) AS "salesCount",
+        p.purchase_date AS "purchaseDate"
+      FROM games g
+      JOIN purchases p ON g.id = p.game_id
+      WHERE p.user_id = $1
+      ORDER BY p.purchase_date DESC
+    `, [userId]);
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Get library error:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
@@ -65,7 +110,21 @@ router.get('/:id', async (req, res) => {
       return res.status(400).json({ message: 'Invalid game ID' });
     }
     
-    const result = await pool.query('SELECT * FROM games WHERE id = $1', [gameId]);
+    const result = await pool.query(`
+      SELECT
+        id,
+        name,
+        price,
+        type,
+        description,
+        image,
+        release_date AS "releaseDate",
+        COALESCE(sales_count, 0) AS "salesCount",
+        created_at AS "createdAt",
+        updated_at AS "updatedAt"
+      FROM games
+      WHERE id = $1
+    `, [gameId]);
     
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'Game not found' });
@@ -74,26 +133,6 @@ router.get('/:id', async (req, res) => {
     res.json(result.rows[0]);
   } catch (error) {
     console.error('Get game error:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
-
-// Get user's library (purchased games)
-router.get('/library', authMiddleware, async (req, res) => {
-  try {
-    const userId = req.user.id;
-    
-    const result = await pool.query(`
-      SELECT g.*, p.purchase_date
-      FROM games g
-      JOIN purchases p ON g.id = p.game_id
-      WHERE p.user_id = $1
-      ORDER BY p.purchase_date DESC
-    `, [userId]);
-
-    res.json(result.rows);
-  } catch (error) {
-    console.error('Get library error:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
@@ -108,7 +147,19 @@ router.post('/', authMiddleware, roleMiddleware(['admin']), async (req, res) => 
     }
 
     const result = await pool.query(
-      'INSERT INTO games (name, price, type, description) VALUES ($1, $2, $3, $4) RETURNING *',
+      `INSERT INTO games (name, price, type, description)
+       VALUES ($1, $2, $3, $4)
+       RETURNING
+         id,
+         name,
+         price,
+         type,
+         description,
+         image,
+         release_date AS "releaseDate",
+         COALESCE(sales_count, 0) AS "salesCount",
+         created_at AS "createdAt",
+         updated_at AS "updatedAt"`,
       [name, parseFloat(price), type, description]
     );
 
@@ -130,7 +181,20 @@ router.put('/:id', authMiddleware, roleMiddleware(['admin']), async (req, res) =
     }
 
     const result = await pool.query(
-      'UPDATE games SET name = $1, price = $2, type = $3, description = $4 WHERE id = $5 RETURNING *',
+      `UPDATE games
+       SET name = $1, price = $2, type = $3, description = $4
+       WHERE id = $5
+       RETURNING
+         id,
+         name,
+         price,
+         type,
+         description,
+         image,
+         release_date AS "releaseDate",
+         COALESCE(sales_count, 0) AS "salesCount",
+         created_at AS "createdAt",
+         updated_at AS "updatedAt"`,
       [name, parseFloat(price), type, description, gameId]
     );
 
@@ -183,7 +247,20 @@ router.post('/:id/upload-image', authMiddleware, roleMiddleware(['admin']), uplo
     const imageUrl = `/uploads/${req.file.filename}`;
 
     const result = await pool.query(
-      'UPDATE games SET image = $1 WHERE id = $2 RETURNING *',
+      `UPDATE games
+       SET image = $1
+       WHERE id = $2
+       RETURNING
+         id,
+         name,
+         price,
+         type,
+         description,
+         image,
+         release_date AS "releaseDate",
+         COALESCE(sales_count, 0) AS "salesCount",
+         created_at AS "createdAt",
+         updated_at AS "updatedAt"`,
       [imageUrl, gameId]
     );
 

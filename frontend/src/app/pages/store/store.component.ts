@@ -17,6 +17,7 @@ import { Game, GameFilter } from '../../models/game.model';
 })
 export class StoreComponent implements OnInit {
   games: Game[] = [];
+  visibleGames: Game[] = [];
   selectedGame: Game | null = null;
   loading = false;
   filter: GameFilter = {};
@@ -39,10 +40,8 @@ export class StoreComponent implements OnInit {
     this.loading = true;
     this.gameService.getGames(this.filter).subscribe({
       next: (games) => {
-        this.games = games.map((game, index) => ({
-          ...game,
-          rank: index + 1
-        }));
+        this.games = games;
+        this.updateVisibleGames();
         this.loading = false;
       },
       error: () => {
@@ -66,6 +65,7 @@ export class StoreComponent implements OnInit {
       this.gameService.getUserLibrary().subscribe({
         next: (ownedGames) => {
           this.ownedGames = ownedGames.map(game => game.id!);
+          this.updateVisibleGames();
         }
       });
     }
@@ -102,6 +102,9 @@ export class StoreComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error adding to cart:', error);
+        if (error?.error?.message === 'You already own this game') {
+          this.loadOwnedGames();
+        }
       }
     });
   }
@@ -112,5 +115,17 @@ export class StoreComponent implements OnInit {
 
   isOwned(gameId: number): boolean {
     return this.ownedGames.includes(gameId);
+  }
+
+  private updateVisibleGames(): void {
+    const filtered = this.games.filter(game => !(game.id && this.isOwned(game.id)));
+    this.visibleGames = filtered.map((game, index) => ({
+      ...game,
+      rank: index + 1
+    }));
+
+    if (this.selectedGame?.id && this.isOwned(this.selectedGame.id)) {
+      this.closeGameDetail();
+    }
   }
 }

@@ -18,6 +18,10 @@
              [class.active]="currentRoute === '/library'"
              class="nav-link">Coupons</a>
 
+          <a (click)="navigate('/your-games')"
+             [class.active]="currentRoute === '/your-games'"
+             class="nav-link">My Games</a>
+
           <a (click)="navigate('/cart')"
              [class.active]="currentRoute === '/cart'"
              class="nav-link cart-link">
@@ -63,6 +67,14 @@
                   <line x1="12" y1="22.08" x2="12" y2="12"/>
                 </svg>
                 My Coupons
+              </a>
+              <a (click)="navigate('/your-games')" class="dropdown-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="6" width="20" height="12" rx="2" ry="2"/>
+                  <path d="M6 12h12"/>
+                  <path d="m14 9 3 3-3 3"/>
+                </svg>
+                My Games
               </a>
               <div class="dropdown-divider"></div>
               <a (click)="logout()" class="dropdown-item logout">

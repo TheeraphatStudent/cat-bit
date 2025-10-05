@@ -1,21 +1,28 @@
+@import '../../../styles/design-tokens.css';
+
 .profile-container {
   max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+  margin: 0 auto var(--space-2xl);
+  padding: var(--space-xl);
+  background: var(--color-surface);
+  border: 3px solid var(--color-secondary-2);
+  box-shadow: var(--shadow-lg);
+  color: var(--color-text-primary);
 }
 
 .profile-header {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  border-radius: 16px;
-  padding: 40px;
-  margin-bottom: 32px;
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+  background: var(--gradient-primary-135);
+  padding: var(--space-xl);
+  margin-bottom: var(--space-xl);
+  border: 3px solid var(--color-secondary-1);
+  box-shadow: var(--shadow-lg);
+  color: white;
 }
 
 .header-content {
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: var(--space-xl);
 }
 
 .user-avatar-large {
@@ -25,36 +32,31 @@
 .user-avatar-large img {
   width: 120px;
   height: 120px;
-  border-radius: 50%;
   object-fit: cover;
-  border: 4px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-full);
+  border: 4px solid rgba(255, 255, 255, 0.35);
+  box-shadow: var(--shadow-md);
 }
 
 .change-avatar-btn {
   position: absolute;
   bottom: 0;
   right: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: white;
-  border: none;
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-secondary-2);
+  background: var(--color-surface);
+  color: var(--color-primary-2);
+  border-radius: var(--radius-full);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
+  transition: transform var(--transition-base);
 }
 
 .change-avatar-btn:hover {
-  transform: scale(1.1);
-  background: #f7fafc;
-}
-
-.change-avatar-btn svg {
-  color: #667eea;
+  transform: scale(1.05);
 }
 
 .header-info {
@@ -62,270 +64,272 @@
 }
 
 .profile-title {
-  margin: 0 0 8px 0;
-  font-size: 36px;
-  font-weight: 700;
-  color: white;
+  margin: 0 0 var(--space-xs);
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
 }
 
 .profile-subtitle {
-  margin: 0 0 12px 0;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 18px;
+  margin: 0 0 var(--space-sm);
+  font-size: var(--font-size-lg);
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .user-role {
   display: inline-block;
-  padding: 6px 16px;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
-  backdrop-filter: blur(10px);
+  letter-spacing: 0.5px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  color: white;
 }
 
 .user-role.admin {
-  background: rgba(255, 255, 255, 0.3);
-  border: 2px solid white;
+  border-color: white;
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .profile-content {
   display: grid;
-  grid-template-columns: 1fr 400px;
-  gap: 32px;
-  margin-bottom: 32px;
+  grid-template-columns: 1fr 380px;
+  gap: var(--space-xl);
+  margin-bottom: var(--space-xl);
 }
 
 .profile-section {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--space-xl);
 }
 
 .edit-profile-card {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  background: var(--color-surface);
+  border: 3px solid var(--color-secondary-2);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-lg);
 }
 
 .edit-profile-card h3 {
-  margin: 0 0 20px 0;
-  font-size: 20px;
-  color: #2d3748;
+  margin: 0 0 var(--space-lg);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
 }
 
 .edit-profile-card h3 svg {
-  color: #667eea;
+  color: var(--color-primary-2);
 }
 
 .profile-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-md);
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
+  gap: var(--space-xs);
 }
 
 .form-group label {
-  margin-bottom: 6px;
-  font-weight: 600;
-  color: #2d3748;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.5px;
 }
 
 .form-group input {
-  padding: 12px 16px;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 16px;
-  transition: all 0.3s ease;
+  padding: var(--space-sm) var(--space-md);
+  border: 3px solid var(--color-secondary-2);
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: var(--color-primary-2);
+  box-shadow: 0 0 0 3px rgba(249, 195, 62, 0.25);
 }
 
 .form-group input.error {
-  border-color: #e53e3e;
+  border-color: var(--color-error);
 }
 
 .error-message {
-  color: #e53e3e;
-  font-size: 14px;
-  margin-top: 4px;
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .update-btn {
-  padding: 12px 24px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  padding: var(--space-sm) var(--space-xl);
+  border: 3px solid var(--color-secondary-2);
+  background: var(--gradient-primary-135);
   color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
 }
 
 .update-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #5a67d8, #6b46c1);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .update-btn:disabled {
-  opacity: 0.6;
+  opacity: 0.7;
   cursor: not-allowed;
 }
 
 .wallet-section {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--space-xl);
 }
 
 .danger-zone {
-  margin-top: 32px;
+  margin-top: var(--space-xl);
 }
 
 .danger-card {
-  background: white;
-  border: 2px solid #fed7d7;
-  border-radius: 12px;
-  padding: 24px;
+  background: var(--color-background);
+  border: 3px solid var(--color-error);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-md);
 }
 
 .danger-card h3 {
-  margin: 0 0 12px 0;
-  color: #e53e3e;
-  font-size: 20px;
+  margin: 0 0 var(--space-sm);
+  color: var(--color-error);
+  font-size: var(--font-size-xl);
 }
 
 .danger-card p {
-  margin: 0 0 16px 0;
-  color: #718096;
+  margin: 0 0 var(--space-md);
+  color: var(--color-text-secondary);
 }
 
 .delete-account-btn {
-  padding: 10px 20px;
-  background: #e53e3e;
+  padding: var(--space-sm) var(--space-lg);
+  border: 3px solid var(--color-error);
+  background: var(--color-error);
   color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background var(--transition-base), transform var(--transition-base);
 }
 
 .delete-account-btn:hover {
-  background: #c53030;
+  transform: translateY(-2px);
+  background: color-mix(in srgb, var(--color-error) 85%, black 15%);
 }
 
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  z-index: 1000;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  padding: var(--space-lg);
+  z-index: 1000;
 }
 
 .modal {
-  background: white;
-  border-radius: 12px;
-  max-width: 400px;
+  background: var(--color-surface);
+  border: 3px solid var(--color-secondary-2);
+  max-width: 420px;
   width: 100%;
+  box-shadow: var(--shadow-lg);
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
-  border-bottom: 1px solid #e2e8f0;
+  padding: var(--space-lg);
+  border-bottom: 3px solid var(--color-border);
 }
 
 .modal-header h3 {
   margin: 0;
-  color: #e53e3e;
+  color: var(--color-text-primary);
 }
 
 .close-btn {
   width: 32px;
   height: 32px;
-  border: none;
-  background: #e2e8f0;
-  border-radius: 50%;
+  border: 3px solid var(--color-secondary-2);
+  background: var(--color-background);
   font-size: 20px;
   cursor: pointer;
 }
 
 .modal-content {
-  padding: 24px;
-}
-
-.modal-content p {
-  margin: 0 0 12px 0;
-  color: #718096;
-  line-height: 1.5;
+  padding: var(--space-lg);
+  color: var(--color-text-secondary);
 }
 
 .modal-actions {
   display: flex;
-  gap: 12px;
-  padding: 0 24px 24px;
+  gap: var(--space-sm);
+  padding: 0 var(--space-lg) var(--space-lg);
 }
 
-.cancel-btn, .confirm-delete-btn {
+.cancel-btn,
+.confirm-delete-btn {
   flex: 1;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
+  padding: var(--space-sm) var(--space-md);
+  border: 3px solid var(--color-border);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background var(--transition-base), color var(--transition-base);
 }
 
 .cancel-btn {
-  background: #e2e8f0;
-  color: #718096;
+  background: var(--color-background);
+  color: var(--color-text-secondary);
 }
 
 .cancel-btn:hover {
-  background: #cbd5e0;
+  background: var(--color-border-hover);
 }
 
 .confirm-delete-btn {
-  background: #e53e3e;
+  border-color: var(--color-error);
+  background: var(--color-error);
   color: white;
 }
 
 .confirm-delete-btn:hover:not(:disabled) {
-  background: #c53030;
+  background: color-mix(in srgb, var(--color-error) 85%, black 15%);
 }
 
 .confirm-delete-btn:disabled {
-  opacity: 0.6;
+  opacity: 0.7;
   cursor: not-allowed;
 }
 
 @media (max-width: 768px) {
+  .profile-container {
+    padding: var(--space-lg);
+  }
+
   .profile-header {
-    padding: 24px;
+    padding: var(--space-lg);
   }
 
   .header-content {
@@ -333,17 +337,12 @@
     text-align: center;
   }
 
-  .user-avatar-large img {
-    width: 100px;
-    height: 100px;
-  }
-
   .profile-title {
-    font-size: 28px;
+    font-size: var(--font-size-3xl);
   }
 
   .profile-subtitle {
-    font-size: 16px;
+    font-size: var(--font-size-base);
   }
 
   .profile-content {

@@ -74,7 +74,7 @@
 
   <div class="games-grid pixel-corners-2" *ngIf="!selectedGame && !loading">
     <app-game-card 
-      *ngFor="let game of games" 
+      *ngFor="let game of visibleGames" 
       [game]="game"
       [inCart]="isInCart(game.id!)"
       [owned]="isOwned(game.id!)"
@@ -88,8 +88,8 @@
     <p>Loading games...</p>
   </div>
 
-  <div class="no-games" *ngIf="!loading && games.length === 0">
-    <p>No games found matching your criteria.</p>
+  <div class="no-games" *ngIf="!loading && visibleGames.length === 0">
+    <p>No games found matching your criteria. Owned titles now live in My Games.</p>
   </div>
 
   <div class="game-detail-overlay" *ngIf="selectedGame" (click)="closeGameDetail()">

@@ -1,7 +1,12 @@
+@import '../../../styles/design-tokens.css';
+
 .admin-container {
   max-width: 1400px;
-  margin: 0 auto;
-  padding: var(--space-lg);
+  margin: 0 auto var(--space-2xl);
+  padding: var(--space-xl);
+  background: var(--color-surface);
+  border: 3px solid var(--color-secondary-2);
+  box-shadow: var(--shadow-lg);
 }
 
 .admin-header {
@@ -62,15 +67,15 @@
 }
 
 .games-icon {
-  background: linear-gradient(135deg, var(--color-success), #38a169);
+  background: linear-gradient(135deg, var(--color-success), color-mix(in srgb, var(--color-success) 80%, white 20%));
 }
 
 .sales-icon {
-  background: linear-gradient(135deg, var(--color-warning), #dd6b20);
+  background: linear-gradient(135deg, var(--color-warning), color-mix(in srgb, var(--color-warning) 80%, white 20%));
 }
 
 .revenue-icon {
-  background: linear-gradient(135deg, var(--color-info), #3182ce);
+  background: linear-gradient(135deg, var(--color-info), color-mix(in srgb, var(--color-info) 80%, white 20%));
 }
 
 .stat-info h3 {
@@ -92,6 +97,7 @@
   margin-bottom: var(--space-lg);
   background: var(--color-border);
   padding: var(--space-xs);
+  border: 3px solid var(--color-secondary-2);
 }
 
 .tab-btn {
@@ -251,33 +257,33 @@ tbody tr:hover {
 .edit-btn {
   background: var(--color-info);
   color: white;
-  border-color: #2b6cb0;
+  border-color: color-mix(in srgb, var(--color-info) 80%, black 20%);
 }
 
 .edit-btn:hover {
-  background: #3182ce;
+  background: color-mix(in srgb, var(--color-info) 80%, white 20%);
   transform: translateY(-1px);
 }
 
 .delete-btn {
   background: var(--color-error);
   color: white;
-  border-color: #c53030;
+  border-color: color-mix(in srgb, var(--color-error) 80%, black 20%);
 }
 
 .delete-btn:hover {
-  background: #c53030;
+  background: color-mix(in srgb, var(--color-error) 80%, black 20%);
   transform: translateY(-1px);
 }
 
 .role-btn {
   background: var(--color-success);
   color: white;
-  border-color: #2f855a;
+  border-color: color-mix(in srgb, var(--color-success) 80%, black 20%);
 }
 
 .role-btn:hover {
-  background: #38a169;
+  background: color-mix(in srgb, var(--color-success) 80%, white 20%);
   transform: translateY(-1px);
 }
 

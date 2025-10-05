@@ -1,5 +1,5 @@
-<div class="profile-container">
-  <div class="profile-header">
+<div class="profile-container pixel-border">
+  <div class="profile-header pixel-border">
     <div class="header-content">
       <div class="user-avatar-large">
         <img [src]="currentUser?.profileImage || '/assets/images/logo.png'" 
@@ -30,7 +30,7 @@
   <div class="profile-content">
     <div class="profile-section">
 
-      <div class="edit-profile-card">
+      <div class="edit-profile-card pixel-border">
         <h3>
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -92,7 +92,7 @@
   </div>
 
   <div class="danger-zone">
-    <div class="danger-card">
+    <div class="danger-card pixel-border">
       <h3>Danger Zone</h3>
       <p>Once you delete your account, there is no going back. Please be certain.</p>
       <button class="delete-account-btn" (click)="confirmDeleteAccount()">
