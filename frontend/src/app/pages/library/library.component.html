@@ -1,93 +1,101 @@
 <div class="library-container">
   <div class="library-header">
-    <h1 class="library-title">My Game Library</h1>
-    <p class="library-subtitle">Your purchased games</p>
+    <h1 class="library-title">Available Coupons</h1>
+    <p class="library-subtitle">Copy and use these discount codes in your cart</p>
   </div>
 
-  <div class="library-content" *ngIf="games.length > 0; else emptyLibrary">
-    <div class="games-grid">
-      <div class="library-game-card" *ngFor="let game of games">
-        <div class="game-image">
-          <img [src]="game.image || '/assets/default-game.jpg'" 
-               [alt]="game.name"
-               onerror="this.src='/assets/default-game.jpg'">
+  <div class="library-content" *ngIf="coupons.length > 0; else emptyCoupons">
+    <div class="coupons-grid">
+      <div class="coupon-card pixel-corners-2" *ngFor="let coupon of coupons" [class.expired]="isExpired(coupon.expire_date)">
+        <div class="coupon-header">
+          <div class="discount-badge">
+            <span class="discount-value">{{coupon.discount_value}}%</span>
+            <span class="discount-label">OFF</span>
+          </div>
+          <div class="coupon-status pixel-corners-3" *ngIf="!isExpired(coupon.expire_date)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            Active
+          </div>
+          <div class="coupon-status expired-status pixel-corners-3" *ngIf="isExpired(coupon.expire_date)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+            Expired
+          </div>
         </div>
         
-        <div class="game-info">
-          <h3 class="game-title">{{game.name}}</h3>
-          <p class="game-type">{{game.type}}</p>
-          <p class="game-description">{{truncateText(game.description, 120)}}</p>
-          
-          <div class="game-meta">
-            <span class="purchase-date">
-              Purchased: {{formatDate(game.purchaseDate!)}}
-            </span>
-            <span class="game-price">{{formatPrice(game.price)}}</span>
+        <div class="coupon-body">
+          <div class="coupon-code-section">
+            <label>Coupon Code</label>
+            <div class="code-display">
+              <input type="text" 
+                     [value]="coupon.code" 
+                     readonly 
+                     #codeInput
+                     class="code-input pixel-corners-3">
+              <button class="copy-btn pixel-corners-3" 
+                      (click)="copyCouponCode(coupon.code, codeInput)"
+                      [disabled]="isExpired(coupon.expire_date)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                {{copiedCode === coupon.code ? 'Copied!' : 'Copy'}}
+              </button>
+            </div>
           </div>
           
-          <div class="game-actions">
-            <button class="play-btn">
-              Play Now
-            </button>
-            <button class="details-btn" (click)="showGameDetails(game)">
-              Details
-            </button>
+          <div class="coupon-details">
+            <div class="detail-item">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+              <span *ngIf="coupon.expire_date">Expires: {{formatDate(coupon.expire_date)}}</span>
+              <span *ngIf="!coupon.expire_date">No expiration</span>
+            </div>
+            <div class="detail-item">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              <span>{{coupon.used_count}}/{{coupon.max_usage}} used</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <ng-template #emptyLibrary>
+  <ng-template #emptyCoupons>
     <div class="empty-library">
-      <div class="empty-library-icon"></div>
-      <h2>Your library is empty</h2>
-      <p>Purchase games from our store to build your collection!</p>
-      <button class="browse-btn" (click)="navigateToStore()">
+      <div class="empty-library-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+          <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+          <line x1="12" y1="22.08" x2="12" y2="12"/>
+        </svg>
+      </div>
+      <h2>No coupons available</h2>
+      <p>Check back later for discount codes!</p>
+      <button class="browse-btn pixel-corners-2" (click)="navigateToStore()">
         Browse Store
       </button>
     </div>
   </ng-template>
 
-  <!-- Game Detail Modal -->
-  <div class="game-detail-overlay" *ngIf="selectedGame" (click)="closeGameDetail()">
-    <div class="game-detail-modal" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2>{{selectedGame.name}}</h2>
-        <button class="close-btn" (click)="closeGameDetail()">×</button>
-      </div>
-      
-      <div class="modal-content">
-        <div class="game-image-large">
-          <img [src]="selectedGame.image || '/assets/default-game.jpg'" 
-               [alt]="selectedGame.name"
-               onerror="this.src='/assets/default-game.jpg'">
-        </div>
-        
-        <div class="game-details">
-          <div class="detail-row">
-            <span class="label">Type:</span>
-            <span class="value">{{selectedGame.type}}</span>
-          </div>
-          <div class="detail-row">
-            <span class="label">Price Paid:</span>
-            <span class="value">{{formatPrice(selectedGame.price)}}</span>
-          </div>
-          <div class="detail-row">
-            <span class="label">Purchase Date:</span>
-            <span class="value">{{formatDate(selectedGame.purchaseDate!)}}</span>
-          </div>
-          <div class="detail-row">
-            <span class="label">Release Date:</span>
-            <span class="value">{{formatDate(selectedGame.releaseDate!)}}</span>
-          </div>
-        </div>
-        
-        <div class="game-description-full" *ngIf="selectedGame.description">
-          <h4>About this game</h4>
-          <p>{{selectedGame.description}}</p>
-        </div>
-      </div>
-    </div>
+  <!-- Success Toast -->
+  <div class="toast pixel-corners-2" *ngIf="showToast" [class.show]="showToast">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+    Coupon code copied to clipboard!
   </div>
 </div>

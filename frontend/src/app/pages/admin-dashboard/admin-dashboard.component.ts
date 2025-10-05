@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { AdminService } from '../../services/admin.service';
 import { GameService } from '../../services/game.service';
 import { DiscountService } from '../../services/discount.service';
@@ -13,7 +13,7 @@ import { DateFormat } from '../../utils/date-format';
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.css']
 })
@@ -25,19 +25,34 @@ export class AdminDashboardComponent implements OnInit {
     totalSales: 0,
     totalRevenue: 0
   };
-  
+
   games: Game[] = [];
   users: User[] = [];
   discountCodes: DiscountCode[] = [];
-  
+
+  filteredGames: Game[] = [];
+  filteredUsers: User[] = [];
+  filteredDiscounts: DiscountCode[] = [];
+
+  searchTerm = '';
+  sortBy = 'name';
+  sortOrder: 'asc' | 'desc' = 'asc';
+
   showGameModal = false;
   showDiscountModal = false;
   editingGame: Game | null = null;
   editingDiscount: DiscountCode | null = null;
   saving = false;
-  
+  loading = false;
+
   gameForm: FormGroup;
   discountForm: FormGroup;
+
+  private lastStatsLoad = 0;
+  private lastGamesLoad = 0;
+  private lastUsersLoad = 0;
+  private lastDiscountsLoad = 0;
+  private readonly CACHE_DURATION = 60000;
 
   constructor(
     private fb: FormBuilder,
@@ -62,48 +77,185 @@ export class AdminDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadStats();
-    this.loadGames();
-    this.loadUsers();
-    this.loadDiscountCodes();
+    this.loadDataForActiveTab();
+  }
+
+  private loadDataForActiveTab(): void {
+    switch (this.activeTab) {
+      case 'games':
+        this.loadGames();
+        break;
+      case 'users':
+        this.loadUsers();
+        break;
+      case 'discounts':
+        this.loadDiscountCodes();
+        break;
+    }
   }
 
   loadStats(): void {
+    const now = Date.now();
+    if (now - this.lastStatsLoad < this.CACHE_DURATION) {
+      return;
+    }
+
     this.adminService.getDashboardStats().subscribe({
       next: (stats) => {
         this.stats = stats;
+        this.lastStatsLoad = now;
       }
     });
   }
 
   loadGames(): void {
+    const now = Date.now();
+    if (now - this.lastGamesLoad < this.CACHE_DURATION && this.games.length > 0) {
+      this.applyFilters();
+      return;
+    }
+
+    this.loading = true;
     this.gameService.getGames().subscribe({
       next: (games) => {
         this.games = games;
+        this.lastGamesLoad = now;
+        this.applyFilters();
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
       }
     });
   }
 
   loadUsers(): void {
+    const now = Date.now();
+    if (now - this.lastUsersLoad < this.CACHE_DURATION && this.users.length > 0) {
+      this.applyFilters();
+      return;
+    }
+
+    this.loading = true;
     this.adminService.getAllUsers().subscribe({
       next: (users) => {
         this.users = users;
+        this.lastUsersLoad = now;
+        this.applyFilters();
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
       }
     });
   }
 
   loadDiscountCodes(): void {
+    const now = Date.now();
+    if (now - this.lastDiscountsLoad < this.CACHE_DURATION && this.discountCodes.length > 0) {
+      this.applyFilters();
+      return;
+    }
+
+    this.loading = true;
     this.discountService.getDiscountCodes().subscribe({
       next: (codes) => {
         this.discountCodes = codes;
+        this.lastDiscountsLoad = now;
+        this.applyFilters();
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
       }
     });
   }
 
   setActiveTab(tab: string): void {
     this.activeTab = tab;
+    this.searchTerm = '';
+    this.loadDataForActiveTab();
   }
 
-  // Game Management
+  onSearch(term: string): void {
+    this.searchTerm = term.toLowerCase();
+    this.applyFilters();
+  }
+
+  onSort(field: string): void {
+    if (this.sortBy === field) {
+      this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortBy = field;
+      this.sortOrder = 'asc';
+    }
+    this.applyFilters();
+  }
+
+  private applyFilters(): void {
+    switch (this.activeTab) {
+      case 'games':
+        this.filteredGames = this.filterAndSortGames();
+        break;
+      case 'users':
+        this.filteredUsers = this.filterAndSortUsers();
+        break;
+      case 'discounts':
+        this.filteredDiscounts = this.filterAndSortDiscounts();
+        break;
+    }
+  }
+
+  private filterAndSortGames(): Game[] {
+    let filtered = [...this.games];
+
+    if (this.searchTerm) {
+      filtered = filtered.filter(g =>
+        g.name.toLowerCase().includes(this.searchTerm) ||
+        g.type.toLowerCase().includes(this.searchTerm)
+      );
+    }
+
+    return this.sortArray(filtered, this.sortBy);
+  }
+
+  private filterAndSortUsers(): User[] {
+    let filtered = [...this.users];
+
+    if (this.searchTerm) {
+      filtered = filtered.filter(u =>
+        u.username.toLowerCase().includes(this.searchTerm) ||
+        u.email.toLowerCase().includes(this.searchTerm)
+      );
+    }
+
+    return this.sortArray(filtered, this.sortBy);
+  }
+
+  private filterAndSortDiscounts(): DiscountCode[] {
+    let filtered = [...this.discountCodes];
+
+    if (this.searchTerm) {
+      filtered = filtered.filter(d =>
+        d.code.toLowerCase().includes(this.searchTerm)
+      );
+    }
+
+    return this.sortArray(filtered, this.sortBy);
+  }
+
+  private sortArray(arr: any[], field: string): any[] {
+    return arr.sort((a, b) => {
+      const aVal = a[field];
+      const bVal = b[field];
+
+      if (aVal === bVal) return 0;
+
+      const comparison = aVal > bVal ? 1 : -1;
+      return this.sortOrder === 'asc' ? comparison : -comparison;
+    });
+  }
+
   showAddGameModal(): void {
     this.editingGame = null;
     this.gameForm.reset();

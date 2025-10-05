@@ -5,32 +5,32 @@
   </div>
 
   <div class="dashboard-stats">
-    <div class="stat-card">
-      <div class="stat-icon users-icon"></div>
+    <div class="stat-card pixel-corners-2">
+      <div class="stat-icon users-icon pixel-corners-3"></div>
       <div class="stat-info">
         <h3>{{stats.totalUsers}}</h3>
         <p>Total Users</p>
       </div>
     </div>
     
-    <div class="stat-card">
-      <div class="stat-icon games-icon"></div>
+    <div class="stat-card pixel-corners-2">
+      <div class="stat-icon games-icon pixel-corners-3"></div>
       <div class="stat-info">
         <h3>{{stats.totalGames}}</h3>
         <p>Total Games</p>
       </div>
     </div>
     
-    <div class="stat-card">
-      <div class="stat-icon sales-icon"></div>
+    <div class="stat-card pixel-corners-2">
+      <div class="stat-icon sales-icon pixel-corners-3"></div>
       <div class="stat-info">
         <h3>{{stats.totalSales}}</h3>
         <p>Total Sales</p>
       </div>
     </div>
     
-    <div class="stat-card">
-      <div class="stat-icon revenue-icon"></div>
+    <div class="stat-card pixel-corners-2">
+      <div class="stat-icon revenue-icon pixel-corners-3"></div>
       <div class="stat-info">
         <h3>{{formatPrice(stats.totalRevenue)}}</h3>
         <p>Total Revenue</p>
@@ -38,18 +38,18 @@
     </div>
   </div>
 
-  <div class="admin-tabs">
-    <button class="tab-btn" 
+  <div class="admin-tabs pixel-corners-2">
+    <button class="tab-btn pixel-corners-3" 
             [class.active]="activeTab === 'games'"
             (click)="setActiveTab('games')">
       Games Management
     </button>
-    <button class="tab-btn" 
+    <button class="tab-btn pixel-corners-3" 
             [class.active]="activeTab === 'users'"
             (click)="setActiveTab('users')">
       Users Management
     </button>
-    <button class="tab-btn" 
+    <button class="tab-btn pixel-corners-3" 
             [class.active]="activeTab === 'discounts'"
             (click)="setActiveTab('discounts')">
       Discount Codes
@@ -57,10 +57,15 @@
   </div>
 
   <!-- Games Management Tab -->
-  <div class="tab-content" *ngIf="activeTab === 'games'">
+  <div class="tab-content pixel-corners-2" *ngIf="activeTab === 'games'">
     <div class="section-header">
       <h2>Games Management</h2>
-      <button class="add-btn" (click)="showAddGameModal()">
+      <input type="text" 
+             class="search-box pixel-corners-3" 
+             placeholder="Search games..." 
+             [(ngModel)]="searchTerm"
+             (input)="onSearch(searchTerm)">
+      <button class="add-btn pixel-corners-3" (click)="showAddGameModal()">
         Add New Game
       </button>
     </div>
@@ -78,7 +83,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let game of games">
+          <tr *ngFor="let game of filteredGames">
             <td>
               <img [src]="game.image || '/assets/default-game.jpg'" 
                    [alt]="game.name"
@@ -91,8 +96,8 @@
             <td>{{game.salesCount}}</td>
             <td>
               <div class="action-buttons">
-                <button class="edit-btn" (click)="editGame(game)">Edit</button>
-                <button class="delete-btn" (click)="deleteGame(game)">Delete</button>
+                <button class="edit-btn pixel-corners-3" (click)="editGame(game)">Edit</button>
+                <button class="delete-btn pixel-corners-3" (click)="deleteGame(game)">Delete</button>
               </div>
             </td>
           </tr>
@@ -102,9 +107,14 @@
   </div>
 
   <!-- Users Management Tab -->
-  <div class="tab-content" *ngIf="activeTab === 'users'">
+  <div class="tab-content pixel-corners-2" *ngIf="activeTab === 'users'">
     <div class="section-header">
       <h2>Users Management</h2>
+      <input type="text" 
+             class="search-box pixel-corners-3" 
+             placeholder="Search users..." 
+             [(ngModel)]="searchTerm"
+             (input)="onSearch(searchTerm)">
     </div>
     
     <div class="users-table">
@@ -120,11 +130,11 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let user of users">
+          <tr *ngFor="let user of filteredUsers">
             <td>{{user.username}}</td>
             <td>{{user.email}}</td>
             <td>
-              <span class="role-badge" [class.admin]="user.role === 'admin'">
+              <span class="role-badge pixel-corners-3" [class.admin]="user.role === 'admin'">
                 {{user.role}}
               </span>
             </td>
@@ -132,10 +142,10 @@
             <td>{{formatDate(user.createdAt!)}}</td>
             <td>
               <div class="action-buttons">
-                <button class="role-btn" (click)="toggleUserRole(user)">
+                <button class="role-btn pixel-corners-3" (click)="toggleUserRole(user)">
                   {{user.role === 'admin' ? 'Make User' : 'Make Admin'}}
                 </button>
-                <button class="delete-btn" (click)="deleteUser(user)">Delete</button>
+                <button class="delete-btn pixel-corners-3" (click)="deleteUser(user)">Delete</button>
               </div>
             </td>
           </tr>
@@ -145,10 +155,15 @@
   </div>
 
   <!-- Discount Codes Tab -->
-  <div class="tab-content" *ngIf="activeTab === 'discounts'">
+  <div class="tab-content pixel-corners-2" *ngIf="activeTab === 'discounts'">
     <div class="section-header">
       <h2>Discount Codes</h2>
-      <button class="add-btn" (click)="showAddDiscountModal()">
+      <input type="text" 
+             class="search-box pixel-corners-3" 
+             placeholder="Search codes..." 
+             [(ngModel)]="searchTerm"
+             (input)="onSearch(searchTerm)">
+      <button class="add-btn pixel-corners-3" (click)="showAddDiscountModal()">
         Add New Code
       </button>
     </div>
@@ -166,7 +181,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let discount of discountCodes">
+          <tr *ngFor="let discount of filteredDiscounts">
             <td><code>{{discount.code}}</code></td>
             <td>{{discount.discountValue}}%</td>
             <td>{{discount.maxUsage}}</td>
@@ -174,8 +189,8 @@
             <td>{{discount.expireDate ? formatDate(discount.expireDate) : 'Never'}}</td>
             <td>
               <div class="action-buttons">
-                <button class="edit-btn" (click)="editDiscount(discount)">Edit</button>
-                <button class="delete-btn" (click)="deleteDiscount(discount)">Delete</button>
+                <button class="edit-btn pixel-corners-3" (click)="editDiscount(discount)">Edit</button>
+                <button class="delete-btn pixel-corners-3" (click)="deleteDiscount(discount)">Delete</button>
               </div>
             </td>
           </tr>
@@ -186,23 +201,23 @@
 
   <!-- Add/Edit Game Modal -->
   <div class="modal-overlay" *ngIf="showGameModal" (click)="closeGameModal()">
-    <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal pixel-corners-2" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>{{editingGame ? 'Edit Game' : 'Add New Game'}}</h3>
-        <button class="close-btn" (click)="closeGameModal()">×</button>
+        <button class="close-btn pixel-corners-3" (click)="closeGameModal()">×</button>
       </div>
       <form [formGroup]="gameForm" (ngSubmit)="saveGame()" class="modal-form">
         <div class="form-group">
           <label for="gameName">Game Name</label>
-          <input type="text" id="gameName" formControlName="name">
+          <input type="text" id="gameName" formControlName="name" class="pixel-corners-3">
         </div>
         <div class="form-group">
           <label for="gamePrice">Price</label>
-          <input type="number" id="gamePrice" formControlName="price" step="0.01">
+          <input type="number" id="gamePrice" formControlName="price" step="0.01" class="pixel-corners-3">
         </div>
         <div class="form-group">
           <label for="gameType">Type</label>
-          <select id="gameType" formControlName="type">
+          <select id="gameType" formControlName="type" class="pixel-corners-3">
             <option value="Action">Action</option>
             <option value="Adventure">Adventure</option>
             <option value="RPG">RPG</option>
@@ -215,11 +230,11 @@
         </div>
         <div class="form-group">
           <label for="gameDescription">Description</label>
-          <textarea id="gameDescription" formControlName="description" rows="3"></textarea>
+          <textarea id="gameDescription" formControlName="description" rows="3" class="pixel-corners-3"></textarea>
         </div>
         <div class="modal-actions">
-          <button type="button" class="cancel-btn" (click)="closeGameModal()">Cancel</button>
-          <button type="submit" class="save-btn" [disabled]="gameForm.invalid || saving">
+          <button type="button" class="cancel-btn pixel-corners-3" (click)="closeGameModal()">Cancel</button>
+          <button type="submit" class="save-btn pixel-corners-3" [disabled]="gameForm.invalid || saving">
             {{saving ? 'Saving...' : 'Save Game'}}
           </button>
         </div>
@@ -229,31 +244,31 @@
 
   <!-- Add/Edit Discount Modal -->
   <div class="modal-overlay" *ngIf="showDiscountModal" (click)="closeDiscountModal()">
-    <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal pixel-corners-2" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>{{editingDiscount ? 'Edit Discount Code' : 'Add New Discount Code'}}</h3>
-        <button class="close-btn" (click)="closeDiscountModal()">×</button>
+        <button class="close-btn pixel-corners-3" (click)="closeDiscountModal()">×</button>
       </div>
       <form [formGroup]="discountForm" (ngSubmit)="saveDiscount()" class="modal-form">
         <div class="form-group">
           <label for="discountCode">Code</label>
-          <input type="text" id="discountCode" formControlName="code">
+          <input type="text" id="discountCode" formControlName="code" class="pixel-corners-3">
         </div>
         <div class="form-group">
           <label for="discountValue">Discount Percentage</label>
-          <input type="number" id="discountValue" formControlName="discountValue" min="1" max="100">
+          <input type="number" id="discountValue" formControlName="discountValue" min="1" max="100" class="pixel-corners-3">
         </div>
         <div class="form-group">
           <label for="maxUsage">Maximum Usage</label>
-          <input type="number" id="maxUsage" formControlName="maxUsage" min="1">
+          <input type="number" id="maxUsage" formControlName="maxUsage" min="1" class="pixel-corners-3">
         </div>
         <div class="form-group">
           <label for="expireDate">Expire Date (Optional)</label>
-          <input type="date" id="expireDate" formControlName="expireDate">
+          <input type="date" id="expireDate" formControlName="expireDate" class="pixel-corners-3">
         </div>
         <div class="modal-actions">
-          <button type="button" class="cancel-btn" (click)="closeDiscountModal()">Cancel</button>
-          <button type="submit" class="save-btn" [disabled]="discountForm.invalid || saving">
+          <button type="button" class="cancel-btn pixel-corners-3" (click)="closeDiscountModal()">Cancel</button>
+          <button type="submit" class="save-btn pixel-corners-3" [disabled]="discountForm.invalid || saving">
             {{saving ? 'Saving...' : 'Save Code'}}
           </button>
         </div>

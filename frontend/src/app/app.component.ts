@@ -21,6 +21,7 @@ export class AppComponent implements OnInit {
   cartItemCount = 0;
   currentRoute = '';
   showNavbar = true;
+  showProfileMenu = false;
 
   private noNavbarRoutes = ['/login', '/register'];
 
@@ -55,7 +56,12 @@ export class AppComponent implements OnInit {
   }
 
   navigate(route: string): void {
+    this.showProfileMenu = false;
     this.router.navigate([route]);
+  }
+
+  toggleProfileMenu(): void {
+    this.showProfileMenu = !this.showProfileMenu;
   }
 
   navigateHome(): void {
@@ -63,12 +69,17 @@ export class AppComponent implements OnInit {
   }
 
   logout(): void {
+    this.showProfileMenu = false;
     this.authService.logout();
     this.router.navigate(['/store']);
   }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.profile-menu')) {
+      this.showProfileMenu = false;
+    }
     this.soundService.playClick();
     this.soundService.enableBackgroundMusic();
   }

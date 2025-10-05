@@ -43,6 +43,19 @@ router.post('/validate', authMiddleware, async (req, res) => {
   }
 });
 
+// Get available discount codes for users
+router.get('/available', authMiddleware, async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT id, code, discount_value, max_usage, used_count, expire_date FROM discount_codes WHERE (expire_date IS NULL OR expire_date > NOW()) AND used_count < max_usage ORDER BY discount_value DESC'
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Get available discount codes error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 // Get all discount codes (admin only)
 router.get('/', authMiddleware, roleMiddleware(['admin']), async (req, res) => {
   try {

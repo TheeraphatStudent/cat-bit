@@ -6,14 +6,37 @@ const pool = new Pool({
   database: process.env.DB_NAME || 'catbit',
   user: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASSWORD || 'password',
+
+  max: 20,
+  min: 2,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000,
+  maxUses: 7500,
+
+  allowExitOnIdle: true,
+  statement_timeout: 30000,
 });
 
-pool.on('connect', () => {
-  console.log('Connected to the PostgreSQL database');
+pool.on('connect', (client) => {
+  client.query('SET timezone = "UTC"');
 });
 
-pool.on('error', (err) => {
-  console.error('Database connection error:', err);
+pool.on('error', (err, client) => {
+  console.error('Unexpected database pool error:', err);
+});
+
+process.on('SIGINT', async () => {
+  console.log('Closing database connection pool...');
+  await pool.end();
+  console.log('Database pool closed');
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  console.log('Closing database connection pool...');
+  await pool.end();
+  console.log('Database pool closed');
+  process.exit(0);
 });
 
 module.exports = pool;
