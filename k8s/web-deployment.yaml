@@ -23,8 +23,7 @@ spec:
         io.kompose.service: web
     spec:
       containers:
-        - image: cat-bit-web
-          imagePullPolicy: Never
+        - image: web
           name: catbit-web
           ports:
             - containerPort: 4200
