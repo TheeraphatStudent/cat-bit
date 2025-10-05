@@ -2,6 +2,9 @@
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
 echo "Starting Minikube with Podman..."
 minikube start --driver=podman --container-runtime=containerd
 
@@ -10,6 +13,7 @@ podman build -f ../backend/Dockerfile.backend -t cat-bit-api ../backend
 podman build -f ../frontend/Dockerfile.frontend -t cat-bit-web ../frontend
 
 echo "Saving images..."
+rm -f cat-bit-api.tar cat-bit-web.tar
 podman save cat-bit-api -o cat-bit-api.tar
 podman save cat-bit-web -o cat-bit-web.tar
 
@@ -18,7 +22,9 @@ minikube image load cat-bit-api.tar
 minikube image load cat-bit-web.tar
 
 echo "Deploying to Kubernetes..."
-kubectl apply -f .
+for file in $(ls *.yaml | grep -v docker-compose); do
+  kubectl apply -f "$file"
+done
 
 echo "Waiting for pods to be ready..."
 kubectl wait --for=condition=ready pod --all --timeout=300s
