@@ -61,6 +61,10 @@ router.get('/:id', async (req, res) => {
   try {
     const gameId = parseInt(req.params.id);
     
+    if (isNaN(gameId)) {
+      return res.status(400).json({ message: 'Invalid game ID' });
+    }
+    
     const result = await pool.query('SELECT * FROM games WHERE id = $1', [gameId]);
     
     if (result.rows.length === 0) {
@@ -121,6 +125,10 @@ router.put('/:id', authMiddleware, roleMiddleware(['admin']), async (req, res) =
     const gameId = parseInt(req.params.id);
     const { name, price, type, description } = req.body;
 
+    if (isNaN(gameId)) {
+      return res.status(400).json({ message: 'Invalid game ID' });
+    }
+
     const result = await pool.query(
       'UPDATE games SET name = $1, price = $2, type = $3, description = $4 WHERE id = $5 RETURNING *',
       [name, parseFloat(price), type, description, gameId]
@@ -142,6 +150,10 @@ router.delete('/:id', authMiddleware, roleMiddleware(['admin']), async (req, res
   try {
     const gameId = parseInt(req.params.id);
 
+    if (isNaN(gameId)) {
+      return res.status(400).json({ message: 'Invalid game ID' });
+    }
+
     const result = await pool.query('DELETE FROM games WHERE id = $1 RETURNING *', [gameId]);
 
     if (result.rows.length === 0) {
@@ -159,6 +171,10 @@ router.delete('/:id', authMiddleware, roleMiddleware(['admin']), async (req, res
 router.post('/:id/upload-image', authMiddleware, roleMiddleware(['admin']), upload.single('image'), async (req, res) => {
   try {
     const gameId = parseInt(req.params.id);
+    
+    if (isNaN(gameId)) {
+      return res.status(400).json({ message: 'Invalid game ID' });
+    }
     
     if (!req.file) {
       return res.status(400).json({ message: 'No image file provided' });
