@@ -1,14 +1,18 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
+import { jwtDecode } from 'jwt-decode';
 
 export interface ImageUploadResponse {
   data: string;
 }
 
 export interface DecodedImageResponse {
+  message: string;
   data: {
+    filename: string;
     url: string;
+    provider: string;
   };
 }
 
@@ -18,7 +22,7 @@ export interface DecodedImageResponse {
 export class ImageUploadService {
   private uploadUrl = 'https://locatto-67775182631.europe-west1.run.app/upload';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   uploadImage(file: File): Observable<DecodedImageResponse> {
     const formData = new FormData();
@@ -26,23 +30,19 @@ export class ImageUploadService {
 
     return this.http.post<ImageUploadResponse>(this.uploadUrl, formData).pipe(
       map(response => {
-        const decodedData = this.decodeImageData(response.data);
+        const decodedData = this.decodeJWT(response.data);
         return decodedData;
       })
     );
   }
 
-  private decodeImageData(encodedData: string): DecodedImageResponse {
+  private decodeJWT(token: string): DecodedImageResponse {
     try {
-      if (encodedData.startsWith('{')) {
-        return JSON.parse(encodedData);
-      }
-
-      const decodedString = atob(encodedData);
-      return JSON.parse(decodedString);
+      const decoded = jwtDecode<DecodedImageResponse>(token);
+      return decoded;
     } catch (error) {
-      console.error('Error decoding image data:', error);
-      throw new Error('Failed to decode image response');
+      console.error('Error decoding JWT:', error);
+      throw new Error('Failed to decode JWT response');
     }
   }
 }

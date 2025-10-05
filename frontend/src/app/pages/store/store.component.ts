@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GameCardComponent } from '../../components/game-card/game-card.component';
 import { GameDetailComponent } from '../../components/game-detail/game-detail.component';
+import { SkeletonCardComponent } from '../../components/skeleton-card/skeleton-card.component';
 import { GameService } from '../../services/game.service';
 import { CartService } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
@@ -11,7 +12,7 @@ import { Game, GameFilter } from '../../models/game.model';
 @Component({
   selector: 'app-store',
   standalone: true,
-  imports: [CommonModule, FormsModule, GameCardComponent, GameDetailComponent],
+  imports: [CommonModule, FormsModule, GameCardComponent, GameDetailComponent, SkeletonCardComponent],
   templateUrl: './store.component.html',
   styleUrls: ['./store.component.css']
 })

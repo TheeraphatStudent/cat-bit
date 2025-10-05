@@ -9,6 +9,8 @@ import { WalletService } from '../../services/wallet.service';
 import { User } from '../../models/user.model';
 import { WalletTransaction } from '../../models/wallet.model';
 import { CustomValidators } from '../../utils/validators';
+import { ImageUploadService } from '../../services/image-upload.service';
+import { finalize, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-profile',
@@ -28,12 +30,16 @@ export class ProfileComponent implements OnInit {
   toppingUp = false;
   showDeleteModal = false;
   deleting = false;
+  uploadingImage = false;
+  imageUploadError = '';
+  readonly maxAvatarSize = 5 * 1024 * 1024; // 5 MB limit
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private walletService: WalletService,
-    private router: Router
+    private router: Router,
+    private imageUploadService: ImageUploadService
   ) {
     this.profileForm = this.fb.group({
       username: ['', [Validators.required, CustomValidators.usernameValidator()]],
@@ -95,12 +101,47 @@ export class ProfileComponent implements OnInit {
   }
 
   onFileSelected(event: any): void {
-    const file = event.target.files[0];
-    if (file) {
-      // Here you would typically upload the file to your server
-      // For now, we'll just show a placeholder
-      console.log('File selected:', file.name);
+    const input = event.target as HTMLInputElement;
+    const file = input?.files?.[0];
+
+    if (!file) {
+      return;
     }
+
+    if (!file.type.startsWith('image/')) {
+      this.imageUploadError = 'Please select a valid image file.';
+      input.value = '';
+      return;
+    }
+
+    if (file.size > this.maxAvatarSize) {
+      this.imageUploadError = 'Image is too large. Please choose a file under 5MB.';
+      input.value = '';
+      return;
+    }
+
+    this.imageUploadError = '';
+    this.uploadingImage = true;
+
+    this.imageUploadService.uploadImage(file).pipe(
+      switchMap(response => this.authService.updateProfile({ profileImage: response.data.url })),
+      finalize(() => {
+        this.uploadingImage = false;
+        input.value = '';
+      })
+    ).subscribe({
+      next: () => {
+        this.imageUploadError = '';
+      },
+      error: (error) => {
+        console.error('Profile image update failed:', error);
+        this.imageUploadError = 'Unable to update profile image. Please try again.';
+      }
+    });
+  }
+
+  get profileImageUrl(): string {
+    return this.currentUser?.profileImage || '/assets/images/logo.png';
   }
 
   onTopUp(amount: number): void {

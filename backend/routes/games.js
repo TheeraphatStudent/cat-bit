@@ -33,8 +33,6 @@ router.get('/', async (req, res) => {
         g.image,
         g.release_date AS "releaseDate",
         COALESCE(g.sales_count, 0) AS "salesCount",
-        g.created_at AS "createdAt",
-        g.updated_at AS "updatedAt",
         ROW_NUMBER() OVER (ORDER BY g.sales_count DESC, g.release_date DESC) AS "rank"
       FROM games g
       WHERE 1 = 1
@@ -119,9 +117,7 @@ router.get('/:id', async (req, res) => {
         description,
         image,
         release_date AS "releaseDate",
-        COALESCE(sales_count, 0) AS "salesCount",
-        created_at AS "createdAt",
-        updated_at AS "updatedAt"
+        COALESCE(sales_count, 0) AS "salesCount"
       FROM games
       WHERE id = $1
     `, [gameId]);
@@ -157,9 +153,7 @@ router.post('/', authMiddleware, roleMiddleware(['admin']), async (req, res) => 
          description,
          image,
          release_date AS "releaseDate",
-         COALESCE(sales_count, 0) AS "salesCount",
-         created_at AS "createdAt",
-         updated_at AS "updatedAt"`,
+         COALESCE(sales_count, 0) AS "salesCount"`,
       [name, parseFloat(price), type, description]
     );
 
@@ -192,9 +186,7 @@ router.put('/:id', authMiddleware, roleMiddleware(['admin']), async (req, res) =
          description,
          image,
          release_date AS "releaseDate",
-         COALESCE(sales_count, 0) AS "salesCount",
-         created_at AS "createdAt",
-         updated_at AS "updatedAt"`,
+         COALESCE(sales_count, 0) AS "salesCount"`,
       [name, parseFloat(price), type, description, gameId]
     );
 
@@ -258,9 +250,7 @@ router.post('/:id/upload-image', authMiddleware, roleMiddleware(['admin']), uplo
          description,
          image,
          release_date AS "releaseDate",
-         COALESCE(sales_count, 0) AS "salesCount",
-         created_at AS "createdAt",
-         updated_at AS "updatedAt"`,
+         COALESCE(sales_count, 0) AS "salesCount"`,
       [imageUrl, gameId]
     );
 

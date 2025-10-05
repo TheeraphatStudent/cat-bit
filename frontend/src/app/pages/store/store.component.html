@@ -83,9 +83,8 @@
     </app-game-card>
   </div>
 
-  <div class="loading" *ngIf="loading">
-    <div class="loading-spinner"></div>
-    <p>Loading games...</p>
+  <div class="games-grid pixel-corners-2" *ngIf="loading">
+    <app-skeleton-card type="game" [count]="6"></app-skeleton-card>
   </div>
 
   <div class="no-games" *ngIf="!loading && visibleGames.length === 0">

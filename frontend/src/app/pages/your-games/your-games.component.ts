@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { GameService } from '../../services/game.service';
+import { SkeletonCardComponent } from '../../components/skeleton-card/skeleton-card.component';
 import { Game } from '../../models/game.model';
 import { PriceFormat } from '../../utils/price-format';
 import { DateFormat } from '../../utils/date-format';
@@ -15,7 +16,7 @@ interface RawGame extends Game {
 @Component({
   selector: 'app-your-games',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SkeletonCardComponent],
   templateUrl: './your-games.component.html',
   styleUrls: ['./your-games.component.css']
 })

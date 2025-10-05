@@ -17,13 +17,13 @@ export class SoundService {
     this.deleteAudio = new Audio('assets/sound/delete.mp3');
     this.hoverAudio = new Audio('assets/sound/hover.mp3');
     this.backgroundAudio = new Audio('assets/sound/background.mp3');
-    
+
     this.backgroundAudio.loop = true;
 
-    this.clickAudio.volume = 0.2;
+    this.clickAudio.volume = 0.15;
     this.backgroundAudio.volume = 0.05;
-    this.typingAudio.volume = 0.3;
-    this.deleteAudio.volume = 0.4;
+    this.typingAudio.volume = 0.2;
+    this.deleteAudio.volume = 0.2;
     this.hoverAudio.volume = 0.15;
   }
 

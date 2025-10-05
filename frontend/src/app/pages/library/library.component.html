@@ -4,7 +4,11 @@
     <p class="library-subtitle">Copy and use these discount codes in your cart</p>
   </div>
 
-  <div class="library-content" *ngIf="coupons.length > 0; else emptyCoupons">
+  <div class="coupons-grid" *ngIf="loading">
+    <app-skeleton-card type="coupon" [count]="4"></app-skeleton-card>
+  </div>
+
+  <div class="library-content" *ngIf="!loading && coupons.length > 0">
     <div class="coupons-grid">
       <div class="coupon-card pixel-corners-2" *ngFor="let coupon of coupons" [class.expired]="isExpired(coupon.expire_date)">
         <div class="coupon-header">
@@ -83,8 +87,10 @@
           <line x1="12" y1="22.08" x2="12" y2="12"/>
         </svg>
       </div>
-      <h2>No coupons available</h2>
-      <p>Check back later for discount codes!</p>
+      <h2 *ngIf="!errorMessage">No coupons available</h2>
+      <h2 *ngIf="errorMessage" class="error-title">Unable to Load Coupons</h2>
+      <p *ngIf="!errorMessage">Check back later for discount codes!</p>
+      <p *ngIf="errorMessage" class="error-text">{{errorMessage}}</p>
       <button class="browse-btn pixel-corners-2" (click)="navigateToStore()">
         Browse Store
       </button>

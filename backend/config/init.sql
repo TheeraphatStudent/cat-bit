@@ -27,7 +27,9 @@ CREATE TABLE IF NOT EXISTS games (
   image TEXT,
   description TEXT,
   release_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  sales_count INT DEFAULT 0
+  sales_count INT DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Create purchases table

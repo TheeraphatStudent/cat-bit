@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { SkeletonCardComponent } from '../../components/skeleton-card/skeleton-card.component';
 import { DateFormat } from '../../utils/date-format';
 import { environment } from '../../../environments/environment';
 
@@ -17,7 +18,7 @@ interface Coupon {
 @Component({
   selector: 'app-library',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SkeletonCardComponent],
   templateUrl: './library.component.html',
   styleUrls: ['./library.component.css']
 })
@@ -26,6 +27,7 @@ export class LibraryComponent implements OnInit {
   loading = false;
   copiedCode: string | null = null;
   showToast = false;
+  errorMessage = '';
   private apiUrl = `${environment.apiEndpoint}/discount`;
 
   constructor(
@@ -39,13 +41,17 @@ export class LibraryComponent implements OnInit {
 
   loadCoupons(): void {
     this.loading = true;
-    this.http.get<Coupon[]>(`${this.apiUrl}`).subscribe({
+    this.errorMessage = '';
+    // Use /available endpoint for regular users to see available coupons
+    this.http.get<Coupon[]>(`${this.apiUrl}/available`).subscribe({
       next: (coupons) => {
         this.coupons = coupons;
         this.loading = false;
       },
-      error: () => {
+      error: (error) => {
         this.loading = false;
+        this.errorMessage = error.error?.message || 'Failed to load coupons';
+        console.error('Load coupons error:', error);
       }
     });
   }

@@ -1,0 +1,35 @@
+<ng-container *ngIf="type === 'game'">
+  <div class="skeleton-game-card pixel-border" *ngFor="let item of skeletonArray">
+    <div class="skeleton-image pixel-border"></div>
+    <div class="skeleton-content">
+      <div class="skeleton-title"></div>
+      <div class="skeleton-type"></div>
+      <div class="skeleton-description">
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line short"></div>
+      </div>
+      <div class="skeleton-meta">
+        <div class="skeleton-tag"></div>
+        <div class="skeleton-tag"></div>
+      </div>
+      <div class="skeleton-footer">
+        <div class="skeleton-price"></div>
+        <div class="skeleton-button"></div>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<ng-container *ngIf="type === 'coupon'">
+  <div class="skeleton-coupon-card pixel-corners-2" *ngFor="let item of skeletonArray">
+    <div class="skeleton-coupon-header"></div>
+    <div class="skeleton-coupon-body">
+      <div class="skeleton-code"></div>
+      <div class="skeleton-details">
+        <div class="skeleton-detail-line"></div>
+        <div class="skeleton-detail-line"></div>
+      </div>
+    </div>
+  </div>
+</ng-container>

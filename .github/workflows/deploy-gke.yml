@@ -1,0 +1,118 @@
+name: Deploy to GKE
+
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GKE_CLUSTER: catbit-cluster
+  GKE_ZONE: us-central1-a
+  FRONTEND_IMAGE: catbit-frontend
+  BACKEND_IMAGE: catbit-backend
+  REGISTRY: gcr.io
+
+jobs:
+  setup-build-publish-deploy:
+    name: Setup, Build, Publish, and Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # Configure Workload Identity Federation and generate an access token.
+    - id: 'auth'
+      name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v2'
+      with:
+        credentials_json: '${{ secrets.GKE_SA_KEY }}'
+
+    # Setup gcloud CLI
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+
+    # Configure Docker to use the gcloud command-line tool as a credential helper
+    - name: Configure Docker
+      run: |-
+        gcloud --quiet auth configure-docker
+
+    # Get the GKE credentials so we can deploy to the cluster
+    - name: Get GKE credentials
+      run: |-
+        gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
+
+    # Build the Frontend Docker image
+    - name: Build Frontend
+      run: |-
+        docker build \
+          --tag "$REGISTRY/$PROJECT_ID/$FRONTEND_IMAGE:$GITHUB_SHA" \
+          --tag "$REGISTRY/$PROJECT_ID/$FRONTEND_IMAGE:latest" \
+          --file ./frontend/Dockerfile.frontend \
+          ./frontend
+
+    # Build the Backend Docker image
+    - name: Build Backend
+      run: |-
+        docker build \
+          --tag "$REGISTRY/$PROJECT_ID/$BACKEND_IMAGE:$GITHUB_SHA" \
+          --tag "$REGISTRY/$PROJECT_ID/$BACKEND_IMAGE:latest" \
+          --file ./backend/Dockerfile.backend \
+          ./backend
+
+    # Push the Docker images to Google Container Registry
+    - name: Publish Frontend
+      run: |-
+        docker push "$REGISTRY/$PROJECT_ID/$FRONTEND_IMAGE:$GITHUB_SHA"
+        docker push "$REGISTRY/$PROJECT_ID/$FRONTEND_IMAGE:latest"
+
+    - name: Publish Backend
+      run: |-
+        docker push "$REGISTRY/$PROJECT_ID/$BACKEND_IMAGE:$GITHUB_SHA"
+        docker push "$REGISTRY/$PROJECT_ID/$BACKEND_IMAGE:latest"
+
+    # Set up kustomize
+    - name: Set up Kustomize
+      run: |-
+        curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
+        chmod u+x ./kustomize
+
+    # Deploy the Docker images to the GKE cluster
+    - name: Deploy Database
+      run: |-
+        kubectl apply -f k8s/postgres-data-persistentvolumeclaim.yaml
+        kubectl apply -f k8s/db-cm1-configmap.yaml
+        kubectl apply -f k8s/db-deployment.yaml
+        kubectl apply -f k8s/db-service.yaml
+
+    - name: Wait for Database
+      run: |-
+        kubectl wait --for=condition=ready pod -l app=catbit-db --timeout=300s
+
+    - name: Deploy Backend
+      run: |-
+        kubectl apply -f k8s/uploads-data-persistentvolumeclaim.yaml
+        kubectl apply -f k8s/api-cm0-configmap.yaml
+        kubectl set image deployment/catbit-api catbit-api=$REGISTRY/$PROJECT_ID/$BACKEND_IMAGE:$GITHUB_SHA -n default || \
+        kubectl apply -f k8s/api-deployment.yaml
+        kubectl apply -f k8s/api-service.yaml
+
+    - name: Deploy Frontend
+      run: |-
+        kubectl set image deployment/catbit-web catbit-web=$REGISTRY/$PROJECT_ID/$FRONTEND_IMAGE:$GITHUB_SHA -n default || \
+        kubectl apply -f k8s/web-deployment.yaml
+        kubectl apply -f k8s/web-service.yaml
+
+    - name: Verify deployment
+      run: |-
+        kubectl rollout status deployment/catbit-db
+        kubectl rollout status deployment/catbit-api
+        kubectl rollout status deployment/catbit-web
+        kubectl get services -o wide

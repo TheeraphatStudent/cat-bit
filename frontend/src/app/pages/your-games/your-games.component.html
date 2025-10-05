@@ -4,9 +4,8 @@
     <p class="subtitle">Everything you own lives here. Jump back into your favourites anytime.</p>
   </div>
 
-  <div class="loading-state" *ngIf="loading">
-    <div class="loading-spinner"></div>
-    <p>Loading your library...</p>
+  <div class="games-grid" *ngIf="loading">
+    <app-skeleton-card type="game" [count]="6"></app-skeleton-card>
   </div>
 
   <div class="error-state pixel-border" *ngIf="!loading && error">
@@ -23,27 +22,25 @@
 
   <div class="games-grid" *ngIf="!loading && !error && ownedGames.length > 0">
     <div class="game-card pixel-border" *ngFor="let game of ownedGames; trackBy: trackByGameId">
-      <div class="game-cover">
+      <div class="game-image pixel-border">
         <img [src]="game.image || '/assets/default-game.jpg'"
              [alt]="game.name"
              onerror="this.src='/assets/default-game.jpg'">
-        <span class="purchase-date">Purchased {{formatDate(game.purchaseDate)}}</span>
+        <span class="purchase-badge pixel-corners-3">Purchased {{formatDate(game.purchaseDate)}}</span>
       </div>
-      <div class="game-details">
-        <div class="game-header">
-          <h3>{{game.name}}</h3>
-          <span class="game-price">{{formatPrice(game.price)}}</span>
-        </div>
-        <div class="game-meta">
-          <span class="tag">{{game.type}}</span>
-          <span class="tag" *ngIf="game.releaseDate">Released {{formatDate(game.releaseDate)}}</span>
-        </div>
+      <div class="game-info">
+        <h3 class="game-title">{{game.name}}</h3>
+        <p class="game-type">{{game.type}}</p>
         <p class="game-description">
           {{game.description || 'No description provided for this game.'}}
         </p>
+        <div class="game-meta">
+          <span class="release-date" *ngIf="game.releaseDate">Released {{formatDate(game.releaseDate)}}</span>
+          <span class="sales-count" *ngIf="game.salesCount !== undefined">{{game.salesCount | number}} sold</span>
+        </div>
         <div class="game-footer">
-          <span class="sales" *ngIf="game.salesCount !== undefined">{{game.salesCount | number}} sales</span>
-          <button class="play-btn" (click)="browseStore()">Find Similar</button>
+          <span class="game-price">{{formatPrice(game.price)}}</span>
+          <button class="play-btn pixel-corners-2" (click)="browseStore()">Find Similar</button>
         </div>
       </div>
     </div>

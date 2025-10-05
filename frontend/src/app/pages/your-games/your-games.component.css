@@ -82,86 +82,89 @@
 
 .games-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: var(--space-lg);
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--space-xl);
 }
 
 .game-card {
   display: flex;
   flex-direction: column;
-  background: var(--color-background);
+  background: var(--color-surface);
   border: 3px solid var(--color-secondary-2);
   box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
+  cursor: pointer;
 }
 
-.game-cover {
+.game-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-primary-2);
+}
+
+.game-image {
   position: relative;
   overflow: hidden;
+  border: 3px solid var(--color-secondary-2);
 }
 
-.game-cover img {
+.game-image img {
   display: block;
   width: 100%;
   height: 200px;
   object-fit: cover;
+  transition: transform var(--transition-base);
 }
 
-.purchase-date {
+.game-card:hover .game-image img {
+  transform: scale(1.05);
+}
+
+.purchase-badge {
   position: absolute;
-  left: var(--space-sm);
-  bottom: var(--space-sm);
+  top: var(--space-sm);
+  right: var(--space-sm);
   padding: var(--space-xs) var(--space-sm);
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--gradient-primary-135);
   color: white;
   font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  border: 2px solid white;
+  box-shadow: var(--shadow-md);
 }
 
-.game-details {
+.game-info {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
-  padding: var(--space-lg);
-}
-
-.game-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-md);
-}
-
-.game-header h3 {
-  margin: 0;
-  font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-bold);
-}
-
-.game-price {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-primary-2);
-}
-
-.game-meta {
-  display: flex;
-  flex-wrap: wrap;
   gap: var(--space-sm);
+  padding: var(--space-lg);
+  flex: 1;
 }
 
-.tag {
-  padding: var(--space-xs) var(--space-sm);
-  background: var(--color-border);
-  border: 2px solid var(--color-secondary-2);
-  font-size: var(--font-size-xs);
+.game-title {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.game-type {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-primary-2);
+  font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--color-text-secondary);
 }
 
 .game-description {
   margin: 0;
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   line-height: 1.6;
   display: -webkit-box;
@@ -170,16 +173,55 @@
   overflow: hidden;
 }
 
+.game-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-top: auto;
+}
+
+.release-date,
+.sales-count {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
 .game-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: var(--space-md);
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 2px solid var(--color-border);
 }
 
-.sales {
-  color: var(--color-text-muted);
+.game-price {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary-2);
+}
+
+.play-btn {
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--gradient-primary-135);
+  color: white;
+  border: 3px solid var(--color-secondary-2);
   font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.play-btn:hover {
+  background: var(--gradient-primary-reverse);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 @media (max-width: 768px) {

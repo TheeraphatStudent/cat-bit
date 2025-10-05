@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { PixelAlertService } from '../../services/pixel-alert.service';
 import { CustomValidators } from '../../utils/validators';
 
 @Component({
@@ -20,7 +21,8 @@ export class LoginComponent {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private alertService: PixelAlertService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, CustomValidators.emailValidator()]],
@@ -36,6 +38,7 @@ export class LoginComponent {
       this.authService.login(this.loginForm.value).subscribe({
         next: (user) => {
           this.loading = false;
+          this.alertService.success(`Welcome back, ${user.username}!`, 'Login Successful');
           if (user.role === 'admin') {
             this.router.navigate(['/admin-dashboard']);
           } else {
@@ -45,6 +48,7 @@ export class LoginComponent {
         error: (error) => {
           this.loading = false;
           this.errorMessage = error.error?.message || 'Login failed. Please try again.';
+          this.alertService.error(this.errorMessage, 'Login Failed');
         }
       });
     }
