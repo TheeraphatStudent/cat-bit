@@ -5,12 +5,14 @@ metadata:
     kompose.cmd: kompose convert -f docker-compose.yaml
     kompose.version: 1.37.0 (fb0539e64)
   labels:
+    app: catbit-db
     io.kompose.service: db
-  name: db
+  name: catbit-db
 spec:
   replicas: 1
   selector:
     matchLabels:
+      app: catbit-db
       io.kompose.service: db
   strategy:
     type: Recreate
@@ -20,6 +22,7 @@ spec:
         kompose.cmd: kompose convert -f docker-compose.yaml
         kompose.version: 1.37.0 (fb0539e64)
       labels:
+        app: catbit-db
         io.kompose.service: db
     spec:
       containers:
@@ -29,9 +32,9 @@ spec:
             - name: POSTGRES_PASSWORD
               value: password
             - name: POSTGRES_USER
+              value: postgres
             - name: PGDATA
               value: /var/lib/postgresql/data/pgdata
-              value: postgres
           image: postgres:15
           name: catbit-db
           ports:
@@ -39,7 +42,6 @@ spec:
               protocol: TCP
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
-              subPath: pgdata
               name: postgres-data
             - mountPath: /docker-entrypoint-initdb.d/init.sql
               name: db-cm1

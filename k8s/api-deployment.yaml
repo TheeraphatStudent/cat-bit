@@ -5,12 +5,14 @@ metadata:
     kompose.cmd: kompose convert -f docker-compose.yaml
     kompose.version: 1.37.0 (fb0539e64)
   labels:
+    app: catbit-api
     io.kompose.service: api
-  name: api
+  name: catbit-api
 spec:
   replicas: 1
   selector:
     matchLabels:
+      app: catbit-api
       io.kompose.service: api
   strategy:
     type: Recreate
@@ -20,6 +22,7 @@ spec:
         kompose.cmd: kompose convert -f docker-compose.yaml
         kompose.version: 1.37.0 (fb0539e64)
       labels:
+        app: catbit-api
         io.kompose.service: api
     spec:
       containers:
@@ -40,8 +43,8 @@ spec:
               value: your_jwt_secret_key_here
             - name: PORT
               value: "3000"
-          image: cat-bit-api
-          imagePullPolicy: Never
+          image: gcr.io/lottocat/catbit-backend:latest
+          imagePullPolicy: Always
           name: catbit-api
           ports:
             - containerPort: 3000

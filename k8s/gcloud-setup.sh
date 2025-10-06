@@ -54,21 +54,25 @@ gcloud container clusters get-credentials $CLUSTER_NAME --zone $ZONE
 echo " Setting up Kubernetes resources..."
 kubectl create namespace catbit --dry-run=client -o yaml | kubectl apply -f -
 
-# Step 6: Build and push Docker images
-echo " Building Docker images..."
+# Step 6: Build and push Docker images using Podman
+echo " Building Docker images with Podman..."
+
+# Configure podman for GCR
+echo "Configuring podman for Google Container Registry..."
+gcloud auth configure-docker
 
 # Build Frontend
 echo "Building frontend..."
-docker build -t gcr.io/$PROJECT_ID/catbit-frontend:latest -f ../frontend/Dockerfile.frontend ../frontend
+podman build -t gcr.io/$PROJECT_ID/catbit-frontend:latest -f ../frontend/Dockerfile.frontend ../frontend
 
 # Build Backend
 echo "Building backend..."
-docker build -t gcr.io/$PROJECT_ID/catbit-backend:latest -f ../backend/Dockerfile.backend ../backend
+podman build -t gcr.io/$PROJECT_ID/catbit-backend:latest -f ../backend/Dockerfile.backend ../backend
 
 # Step 7: Push images to GCR
 echo " Pushing images to Google Container Registry..."
-docker push gcr.io/$PROJECT_ID/catbit-frontend:latest
-docker push gcr.io/$PROJECT_ID/catbit-backend:latest
+podman push gcr.io/$PROJECT_ID/catbit-frontend:latest
+podman push gcr.io/$PROJECT_ID/catbit-backend:latest
 
 # Step 8: Deploy to Kubernetes
 echo "  Deploying to Kubernetes..."
@@ -98,18 +102,63 @@ kubectl apply -f web-service.yaml
 echo " Waiting for frontend to be ready..."
 kubectl wait --for=condition=ready pod -l app=catbit-web --timeout=300s
 
-# Step 9: Get external IP
+# Step 9: Get external IP and update frontend environment
 echo " Getting external IP address..."
 echo "Waiting for LoadBalancer IP..."
 sleep 30
 
-EXTERNAL_IP=$(kubectl get service catbit-web -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+# Get API external IP
+API_EXTERNAL_IP=""
+echo "Waiting for API LoadBalancer IP..."
+for i in {1..30}; do
+  API_EXTERNAL_IP=$(kubectl get service catbit-api -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null)
+  if [ ! -z "$API_EXTERNAL_IP" ]; then
+    break
+  fi
+  echo "Attempt $i/30: Waiting for API IP..."
+  sleep 10
+done
+
+# Get Web external IP
+WEB_EXTERNAL_IP=$(kubectl get service catbit-web -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+
+# Update frontend environment files with API endpoint
+if [ ! -z "$API_EXTERNAL_IP" ]; then
+  echo " Updating frontend environment files..."
+  
+  # Update production environment
+  cat > ../frontend/src/environments/environment.production.ts << EOF
+export const environment = {
+  production: true,
+  apiEndpoint: "http://$API_EXTERNAL_IP:3000"
+};
+EOF
+
+  # Update prod environment
+  cat > ../frontend/src/environments/environment.prod.ts << EOF
+export const environment = {
+  production: true,
+  apiEndpoint: "http://$API_EXTERNAL_IP:3000"
+};
+EOF
+
+  echo " Frontend environment updated with API endpoint: http://$API_EXTERNAL_IP:3000"
+  
+  # Rebuild and redeploy frontend with updated environment
+  echo " Rebuilding frontend with updated API endpoint..."
+  podman build -t gcr.io/$PROJECT_ID/catbit-frontend:latest -f ../frontend/Dockerfile.frontend ../frontend
+  podman push gcr.io/$PROJECT_ID/catbit-frontend:latest
+  
+  # Restart frontend deployment to use new image
+  kubectl rollout restart deployment/catbit-web
+  kubectl wait --for=condition=ready pod -l app=catbit-web --timeout=300s
+fi
 
 echo ""
 echo " Deployment Complete!"
 echo "======================="
-echo " Frontend URL: http://$EXTERNAL_IP"
-echo " API URL: http://$(kubectl get service catbit-api -o jsonpath='{.status.loadBalancer.ingress[0].ip}')"
+echo " Frontend URL: http://$WEB_EXTERNAL_IP"
+echo " API URL: http://$API_EXTERNAL_IP:3000"
 echo ""
 echo " Check deployment status:"
 echo "  kubectl get pods"

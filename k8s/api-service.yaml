@@ -1,16 +1,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f docker-compose.yaml
-    kompose.version: 1.37.0 (fb0539e64)
   labels:
     io.kompose.service: api
-  name: api
+  name: catbit-api
 spec:
+  type: LoadBalancer
   ports:
-    - name: "3000"
+    - name: "api"
       port: 3000
       targetPort: 3000
+      protocol: TCP
   selector:
-    io.kompose.service: api
+    app: catbit-api
