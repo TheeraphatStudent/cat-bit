@@ -29,7 +29,7 @@ export class AuthService {
   }
 
   login(request: LoginRequest): Observable<User> {
-    return this.http.post<{user: User, token: string}>(`${this.apiUrl}/login`, request)
+    return this.http.post<{ user: User, token: string }>(`${this.apiUrl}/login`, request)
       .pipe(
         tap(response => {
           sessionStorage.setItem('token', response.token);
@@ -52,6 +52,8 @@ export class AuthService {
   }
 
   updateProfile(user: Partial<User>): Observable<User> {
+    console.log(`User: `, user)
+
     return this.http.put<User>(`${this.apiUrl}/update`, user)
       .pipe(
         tap(updatedUser => this.currentUserSubject.next(updatedUser))

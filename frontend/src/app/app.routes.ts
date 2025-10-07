@@ -6,7 +6,7 @@ import { RoleGuard } from './guards/role.guard';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: '/store',
+    redirectTo: '/login',
     pathMatch: 'full'
   },
   {
@@ -50,6 +50,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: '/store'
+    redirectTo: '/login'
   }
 ];

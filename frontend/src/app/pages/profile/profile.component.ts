@@ -11,6 +11,7 @@ import { WalletTransaction } from '../../models/wallet.model';
 import { CustomValidators } from '../../utils/validators';
 import { ImageUploadService } from '../../services/image-upload.service';
 import { finalize, switchMap } from 'rxjs/operators';
+import { decodeJWT } from '../../utils/json-helper';
 
 @Component({
   selector: 'app-profile',
@@ -21,7 +22,7 @@ import { finalize, switchMap } from 'rxjs/operators';
 })
 export class ProfileComponent implements OnInit {
   @ViewChild('fileInput') fileInput!: ElementRef;
-  
+
   currentUser: User | null = null;
   profileForm: FormGroup;
   walletBalance = 0;
@@ -85,12 +86,16 @@ export class ProfileComponent implements OnInit {
   updateProfile(): void {
     if (this.profileForm.valid) {
       this.updating = true;
-      this.authService.updateProfile(this.profileForm.value).subscribe({
-        next: () => {
+      this.authService.updateProfile(this.profileForm.value).pipe(
+        switchMap(() => this.authService.getCurrentUser())
+      ).subscribe({
+        next: (updatedUser) => {
           this.updating = false;
+          console.log('Profile updated successfully:', updatedUser);
         },
-        error: () => {
+        error: (error) => {
           this.updating = false;
+          console.error('Profile update failed:', error);
         }
       });
     }
@@ -123,15 +128,27 @@ export class ProfileComponent implements OnInit {
     this.imageUploadError = '';
     this.uploadingImage = true;
 
+    // Check if user is authenticated
+    if (!this.authService.isAuthenticated()) {
+      this.imageUploadError = 'Authentication required. Please log in again.';
+      this.uploadingImage = false;
+      input.value = '';
+      return;
+    }
+
     this.imageUploadService.uploadImage(file).pipe(
-      switchMap(response => this.authService.updateProfile({ profileImage: response.data.url })),
+      switchMap(response => this.authService.updateProfile({ 
+        profileImage: response.data.url
+      })),
+      switchMap(() => this.authService.getCurrentUser()),
       finalize(() => {
         this.uploadingImage = false;
         input.value = '';
       })
     ).subscribe({
-      next: () => {
+      next: (updatedUser) => {
         this.imageUploadError = '';
+        console.log('Profile image updated successfully:', updatedUser);
       },
       error: (error) => {
         console.error('Profile image update failed:', error);

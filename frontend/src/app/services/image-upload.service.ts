@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
+import { decodeJWT } from '../utils/json-helper';
 
 export interface ImageUploadResponse {
   data: string;
@@ -30,19 +31,12 @@ export class ImageUploadService {
 
     return this.http.post<ImageUploadResponse>(this.uploadUrl, formData).pipe(
       map(response => {
-        const decodedData = this.decodeJWT(response.data);
+        const decodedData = decodeJWT(response.data);
+
+        // console.log("Update response: ", decodedData)
+
         return decodedData;
       })
     );
-  }
-
-  private decodeJWT(token: string): DecodedImageResponse {
-    try {
-      const decoded = jwtDecode<DecodedImageResponse>(token);
-      return decoded;
-    } catch (error) {
-      console.error('Error decoding JWT:', error);
-      throw new Error('Failed to decode JWT response');
-    }
   }
 }

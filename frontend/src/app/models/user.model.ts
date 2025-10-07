@@ -6,7 +6,7 @@ export interface User {
   role: 'user' | 'admin';
   profileImage?: string;
   walletBalance?: number;
-  createdAt: Date;
+  createdAt?: Date;
 }
 
 export interface LoginRequest {
