@@ -32,14 +32,7 @@
                   (ngModelChange)="onFilterChange()"
                   class="filter-select">
             <option value="">All Genres</option>
-            <option value="Action">Action</option>
-            <option value="Adventure">Adventure</option>
-            <option value="RPG">RPG</option>
-            <option value="Strategy">Strategy</option>
-            <option value="Sports">Sports</option>
-            <option value="Racing">Racing</option>
-            <option value="Puzzle">Puzzle</option>
-            <option value="Simulation">Simulation</option>
+            <option *ngFor="let type of gameTypes" [value]="type.name">{{type.name}}</option>
           </select>
         </div>
     

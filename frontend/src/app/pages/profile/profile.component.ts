@@ -62,7 +62,7 @@ export class ProfileComponent implements OnInit {
           username: user.username,
           email: user.email
         });
-        this.walletBalance = user.walletBalance || 0;
+        this.walletBalance = user.wallet_balance || 0;
       }
     });
   }
@@ -137,7 +137,7 @@ export class ProfileComponent implements OnInit {
     }
 
     this.imageUploadService.uploadImage(file).pipe(
-      switchMap(response => this.authService.updateProfile({ 
+      switchMap(response => this.authService.updateProfile({
         profileImage: response.data.url
       })),
       switchMap(() => this.authService.getCurrentUser()),

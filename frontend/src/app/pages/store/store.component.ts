@@ -7,7 +7,9 @@ import { SkeletonCardComponent } from '../../components/skeleton-card/skeleton-c
 import { GameService } from '../../services/game.service';
 import { CartService } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
+import { GameTypeService } from '../../services/game-type.service';
 import { Game, GameFilter } from '../../models/game.model';
+import { GameType } from '../../models/game-type.model';
 
 @Component({
   selector: 'app-store',
@@ -24,17 +26,28 @@ export class StoreComponent implements OnInit {
   filter: GameFilter = {};
   cartItems: number[] = [];
   ownedGames: number[] = [];
+  gameTypes: GameType[] = [];
 
   constructor(
     private gameService: GameService,
     private cartService: CartService,
-    private authService: AuthService
+    private authService: AuthService,
+    private gameTypeService: GameTypeService
   ) {}
 
   ngOnInit(): void {
+    this.loadGameTypes();
     this.loadGames();
     this.loadCartItems();
     this.loadOwnedGames();
+  }
+
+  loadGameTypes(): void {
+    this.gameTypeService.getGameTypes().subscribe({
+      next: (types) => {
+        this.gameTypes = types;
+      }
+    });
   }
 
   loadGames(): void {

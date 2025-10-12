@@ -21,6 +21,10 @@ export class AdminService {
     return this.http.get<WalletTransaction[]>(`${this.apiUrl}/users/${userId}/transactions`);
   }
 
+  updateUser(userId: number, userData: Partial<User>): Observable<User> {
+    return this.http.put<User>(`${this.apiUrl}/users/${userId}`, userData);
+  }
+
   updateUserRole(userId: number, role: 'user' | 'admin'): Observable<User> {
     return this.http.put<User>(`${this.apiUrl}/users/${userId}/role`, { role });
   }

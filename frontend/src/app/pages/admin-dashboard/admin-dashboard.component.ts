@@ -4,9 +4,13 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { AdminService } from '../../services/admin.service';
 import { GameService } from '../../services/game.service';
 import { DiscountService } from '../../services/discount.service';
+import { ImageUploadService } from '../../services/image-upload.service';
+import { GameTypeService } from '../../services/game-type.service';
 import { Game } from '../../models/game.model';
 import { User } from '../../models/user.model';
 import { DiscountCode } from '../../models/discount.model';
+import { WalletTransaction } from '../../models/wallet.model';
+import { GameType } from '../../models/game-type.model';
 import { PriceFormat } from '../../utils/price-format';
 import { DateFormat } from '../../utils/date-format';
 
@@ -29,6 +33,7 @@ export class AdminDashboardComponent implements OnInit {
   games: Game[] = [];
   users: User[] = [];
   discountCodes: DiscountCode[] = [];
+  gameTypes: GameType[] = [];
 
   filteredGames: Game[] = [];
   filteredUsers: User[] = [];
@@ -40,31 +45,47 @@ export class AdminDashboardComponent implements OnInit {
 
   showGameModal = false;
   showDiscountModal = false;
+  showUserModal = false;
+  showTransactionModal = false;
+  showGameTypeModal = false;
+
   editingGame: Game | null = null;
   editingDiscount: DiscountCode | null = null;
+  editingUser: User | null = null;
+  editingGameType: GameType | null = null;
+  selectedUserTransactions: WalletTransaction[] = [];
   saving = false;
   loading = false;
+  uploadingImage = false;
+  selectedGameImage: File | null = null;
+  gameImagePreview: string | null = null;
 
   gameForm: FormGroup;
   discountForm: FormGroup;
+  userForm: FormGroup;
+  gameTypeForm: FormGroup;
 
   private lastStatsLoad = 0;
   private lastGamesLoad = 0;
   private lastUsersLoad = 0;
   private lastDiscountsLoad = 0;
+  private lastGameTypesLoad = 0;
   private readonly CACHE_DURATION = 60000;
 
   constructor(
     private fb: FormBuilder,
     private adminService: AdminService,
     private gameService: GameService,
-    private discountService: DiscountService
+    private discountService: DiscountService,
+    private imageUploadService: ImageUploadService,
+    private gameTypeService: GameTypeService
   ) {
     this.gameForm = this.fb.group({
       name: ['', Validators.required],
       price: ['', [Validators.required, Validators.min(0)]],
       type: ['', Validators.required],
-      description: ['']
+      description: [''],
+      image: ['']
     });
 
     this.discountForm = this.fb.group({
@@ -73,10 +94,22 @@ export class AdminDashboardComponent implements OnInit {
       maxUsage: ['', [Validators.required, Validators.min(1)]],
       expireDate: ['']
     });
+
+    this.userForm = this.fb.group({
+      username: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      role: ['', Validators.required],
+      wallet_balance: ['', [Validators.required, Validators.min(0)]]
+    });
+
+    this.gameTypeForm = this.fb.group({
+      name: ['', Validators.required]
+    });
   }
 
   ngOnInit(): void {
     this.loadStats();
+    this.loadGameTypes();
     this.loadDataForActiveTab();
   }
 
@@ -90,6 +123,9 @@ export class AdminDashboardComponent implements OnInit {
         break;
       case 'discounts':
         this.loadDiscountCodes();
+        break;
+      case 'game-types':
+        this.loadGameTypes();
         break;
     }
   }
@@ -163,6 +199,25 @@ export class AdminDashboardComponent implements OnInit {
         this.discountCodes = codes;
         this.lastDiscountsLoad = now;
         this.applyFilters();
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+      }
+    });
+  }
+
+  loadGameTypes(): void {
+    const now = Date.now();
+    if (now - this.lastGameTypesLoad < this.CACHE_DURATION && this.gameTypes.length > 0) {
+      return;
+    }
+
+    this.loading = true;
+    this.gameTypeService.getGameTypes().subscribe({
+      next: (types) => {
+        this.gameTypes = types;
+        this.lastGameTypesLoad = now;
         this.loading = false;
       },
       error: () => {
@@ -264,11 +319,14 @@ export class AdminDashboardComponent implements OnInit {
 
   editGame(game: Game): void {
     this.editingGame = game;
+    this.selectedGameImage = null;
+    this.gameImagePreview = game.image || null;
     this.gameForm.patchValue({
       name: game.name,
       price: game.price,
       type: game.type,
-      description: game.description
+      description: game.description,
+      image: game.image || ''
     });
     this.showGameModal = true;
   }
@@ -276,36 +334,70 @@ export class AdminDashboardComponent implements OnInit {
   closeGameModal(): void {
     this.showGameModal = false;
     this.editingGame = null;
+    this.selectedGameImage = null;
+    this.gameImagePreview = null;
+  }
+
+  onGameImageSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedGameImage = file;
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.gameImagePreview = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
   saveGame(): void {
     if (this.gameForm.valid) {
       this.saving = true;
-      const gameData = this.gameForm.value;
 
-      if (this.editingGame) {
-        this.gameService.updateGame(this.editingGame.id!, gameData).subscribe({
-          next: () => {
-            this.saving = false;
-            this.closeGameModal();
-            this.loadGames();
+      // If there's a new image, upload it first
+      if (this.selectedGameImage) {
+        this.uploadingImage = true;
+        this.imageUploadService.uploadImage(this.selectedGameImage).subscribe({
+          next: (response) => {
+            this.uploadingImage = false;
+            const gameData = { ...this.gameForm.value, image: response.data.url };
+            this.saveGameData(gameData);
           },
           error: () => {
+            this.uploadingImage = false;
             this.saving = false;
+            alert('Failed to upload image');
           }
         });
       } else {
-        this.gameService.createGame(gameData).subscribe({
-          next: () => {
-            this.saving = false;
-            this.closeGameModal();
-            this.loadGames();
-          },
-          error: () => {
-            this.saving = false;
-          }
-        });
+        this.saveGameData(this.gameForm.value);
       }
+    }
+  }
+
+  private saveGameData(gameData: any): void {
+    if (this.editingGame) {
+      this.gameService.updateGame(this.editingGame.id!, gameData).subscribe({
+        next: () => {
+          this.saving = false;
+          this.closeGameModal();
+          this.loadGames();
+        },
+        error: () => {
+          this.saving = false;
+        }
+      });
+    } else {
+      this.gameService.createGame(gameData).subscribe({
+        next: () => {
+          this.saving = false;
+          this.closeGameModal();
+          this.loadGames();
+        },
+        error: () => {
+          this.saving = false;
+        }
+      });
     }
   }
 
@@ -329,6 +421,17 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
+  toggleUserEdited(user: User): void {
+    this.editingUser = user;
+    this.userForm.patchValue({
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      wallet_balance: user.wallet_balance || 0
+    });
+    this.showUserModal = true;
+  }
+
   deleteUser(user: User): void {
     if (confirm(`Are you sure you want to delete user "${user.username}"?`)) {
       this.adminService.deleteUser(user.id!).subscribe({
@@ -337,6 +440,51 @@ export class AdminDashboardComponent implements OnInit {
         }
       });
     }
+  }
+
+  closeUserModel(): void {
+    this.showUserModal = false;
+    this.editingUser = null;
+  }
+
+  saveUser(): void {
+    if (this.userForm.valid && this.editingUser) {
+      this.saving = true;
+      const userData = this.userForm.value;
+
+      this.adminService.updateUser(this.editingUser.id!, userData).subscribe({
+        next: () => {
+          this.saving = false;
+          this.closeUserModel();
+          this.loadUsers();
+        },
+        error: () => {
+          this.saving = false;
+        }
+      });
+    }
+  }
+
+  viewUserTransactions(user: User): void {
+    this.editingUser = user;
+    this.loading = true;
+    this.adminService.getUserTransactions(user.id!).subscribe({
+      next: (transactions) => {
+        this.selectedUserTransactions = transactions;
+        this.showTransactionModal = true;
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+        alert('Failed to load transactions');
+      }
+    });
+  }
+
+  closeTransactionModal(): void {
+    this.showTransactionModal = false;
+    this.selectedUserTransactions = [];
+    this.editingUser = null;
   }
 
   // Discount Management
@@ -398,6 +546,70 @@ export class AdminDashboardComponent implements OnInit {
       this.discountService.deleteDiscountCode(discount.id!).subscribe({
         next: () => {
           this.loadDiscountCodes();
+        }
+      });
+    }
+  }
+
+  // Game Type Management
+  showAddGameTypeModal(): void {
+    this.editingGameType = null;
+    this.gameTypeForm.reset();
+    this.showGameTypeModal = true;
+  }
+
+  editGameType(gameType: GameType): void {
+    this.editingGameType = gameType;
+    this.gameTypeForm.patchValue({
+      name: gameType.name
+    });
+    this.showGameTypeModal = true;
+  }
+
+  closeGameTypeModal(): void {
+    this.showGameTypeModal = false;
+    this.editingGameType = null;
+  }
+
+  saveGameType(): void {
+    if (this.gameTypeForm.valid) {
+      this.saving = true;
+      const gameTypeData = this.gameTypeForm.value;
+
+      if (this.editingGameType) {
+        this.gameTypeService.updateGameType(this.editingGameType.id!, gameTypeData).subscribe({
+          next: () => {
+            this.saving = false;
+            this.closeGameTypeModal();
+            this.loadGameTypes();
+          },
+          error: () => {
+            this.saving = false;
+          }
+        });
+      } else {
+        this.gameTypeService.createGameType(gameTypeData).subscribe({
+          next: () => {
+            this.saving = false;
+            this.closeGameTypeModal();
+            this.loadGameTypes();
+          },
+          error: () => {
+            this.saving = false;
+          }
+        });
+      }
+    }
+  }
+
+  deleteGameType(gameType: GameType): void {
+    if (confirm(`Are you sure you want to delete game type "${gameType.name}"?`)) {
+      this.gameTypeService.deleteGameType(gameType.id!).subscribe({
+        next: () => {
+          this.loadGameTypes();
+        },
+        error: (err) => {
+          alert(err.error?.message || 'Failed to delete game type');
         }
       });
     }

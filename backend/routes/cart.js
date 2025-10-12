@@ -287,8 +287,11 @@ router.post('/checkout', authMiddleware, async (req, res) => {
         return res.status(400).json({ message: 'You already own some of these games' });
       }
 
-      // Create purchases
+      // Create purchases and wallet transactions for each game
       for (const gameId of gameIds) {
+        const game = gamesResult.rows.find(g => g.id === gameId);
+        const gamePrice = parseFloat(game.price);
+        
         await pool.query(
           'INSERT INTO purchases (user_id, game_id) VALUES ($1, $2)',
           [userId, gameId]
@@ -299,18 +302,18 @@ router.post('/checkout', authMiddleware, async (req, res) => {
           'UPDATE games SET sales_count = sales_count + 1 WHERE id = $1',
           [gameId]
         );
+
+        // Create wallet transaction for this specific game purchase
+        await pool.query(
+          'INSERT INTO wallet_transactions (user_id, type, amount, game_id) VALUES ($1, $2, $3, $4)',
+          [userId, 'purchase', gamePrice, gameId]
+        );
       }
 
       // Update user wallet balance
       await pool.query(
         'UPDATE users SET wallet_balance = wallet_balance - $1 WHERE id = $2',
         [totalCost, userId]
-      );
-
-      // Create wallet transaction
-      await pool.query(
-        'INSERT INTO wallet_transactions (user_id, type, amount) VALUES ($1, $2, $3)',
-        [userId, 'purchase', totalCost]
       );
 
       // Update discount code usage

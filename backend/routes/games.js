@@ -136,15 +136,15 @@ router.get('/:id', async (req, res) => {
 // Create game (admin only)
 router.post('/', authMiddleware, roleMiddleware(['admin']), async (req, res) => {
   try {
-    const { name, price, type, description } = req.body;
+    const { name, price, type, description, image } = req.body;
 
     if (!name || !price || !type) {
       return res.status(400).json({ message: 'Name, price, and type are required' });
     }
 
     const result = await pool.query(
-      `INSERT INTO games (name, price, type, description)
-       VALUES ($1, $2, $3, $4)
+      `INSERT INTO games (name, price, type, description, image)
+       VALUES ($1, $2, $3, $4, $5)
        RETURNING
          id,
          name,
@@ -154,7 +154,7 @@ router.post('/', authMiddleware, roleMiddleware(['admin']), async (req, res) => 
          image,
          release_date AS "releaseDate",
          COALESCE(sales_count, 0) AS "salesCount"`,
-      [name, parseFloat(price), type, description]
+      [name, parseFloat(price), type, description, image || null]
     );
 
     res.status(201).json(result.rows[0]);
@@ -168,27 +168,46 @@ router.post('/', authMiddleware, roleMiddleware(['admin']), async (req, res) => 
 router.put('/:id', authMiddleware, roleMiddleware(['admin']), async (req, res) => {
   try {
     const gameId = parseInt(req.params.id);
-    const { name, price, type, description } = req.body;
+    const { name, price, type, description, image } = req.body;
 
     if (isNaN(gameId)) {
       return res.status(400).json({ message: 'Invalid game ID' });
     }
 
-    const result = await pool.query(
-      `UPDATE games
-       SET name = $1, price = $2, type = $3, description = $4
-       WHERE id = $5
-       RETURNING
-         id,
-         name,
-         price,
-         type,
-         description,
-         image,
-         release_date AS "releaseDate",
-         COALESCE(sales_count, 0) AS "salesCount"`,
-      [name, parseFloat(price), type, description, gameId]
-    );
+    // Build dynamic update query
+    const updates = [];
+    const values = [];
+    let paramCount = 1;
+
+    if (name !== undefined) {
+      updates.push(`name = $${paramCount++}`);
+      values.push(name);
+    }
+    if (price !== undefined) {
+      updates.push(`price = $${paramCount++}`);
+      values.push(parseFloat(price));
+    }
+    if (type !== undefined) {
+      updates.push(`type = $${paramCount++}`);
+      values.push(type);
+    }
+    if (description !== undefined) {
+      updates.push(`description = $${paramCount++}`);
+      values.push(description);
+    }
+    if (image !== undefined) {
+      updates.push(`image = $${paramCount++}`);
+      values.push(image);
+    }
+
+    if (updates.length === 0) {
+      return res.status(400).json({ message: 'No fields to update' });
+    }
+
+    values.push(gameId);
+    const query = `UPDATE games SET ${updates.join(', ')} WHERE id = $${paramCount} RETURNING id, name, price, type, description, image, release_date AS "releaseDate", COALESCE(sales_count, 0) AS "salesCount"`;
+
+    const result = await pool.query(query, values);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'Game not found' });

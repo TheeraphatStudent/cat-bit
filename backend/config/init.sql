@@ -18,6 +18,13 @@ CREATE TABLE IF NOT EXISTS user_sessions (
   discount_code VARCHAR(50)
 );
 
+-- Create game_types table
+CREATE TABLE IF NOT EXISTS game_types (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(50) UNIQUE NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Create games table
 CREATE TABLE IF NOT EXISTS games (
   id SERIAL PRIMARY KEY,
@@ -47,6 +54,7 @@ CREATE TABLE IF NOT EXISTS wallet_transactions (
   user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   type VARCHAR(20) CHECK(type IN ('topup','purchase')) NOT NULL,
   amount NUMERIC(10,2) NOT NULL,
+  game_id INT REFERENCES games(id) ON DELETE SET NULL,
   transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -69,6 +77,18 @@ ON CONFLICT (email) DO NOTHING;
 INSERT INTO users (username, email, password, role, wallet_balance)
 VALUES ('testuser', 'user@catbit.com', '$2a$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW', 'user', 500)
 ON CONFLICT (email) DO NOTHING;
+
+-- Insert default game types
+INSERT INTO game_types (name) VALUES
+('Action'),
+('Adventure'),
+('RPG'),
+('Strategy'),
+('Sports'),
+('Racing'),
+('Puzzle'),
+('Simulation')
+ON CONFLICT (name) DO NOTHING;
 
 -- Insert sample games
 INSERT INTO games (name, price, type, image, description, sales_count) VALUES

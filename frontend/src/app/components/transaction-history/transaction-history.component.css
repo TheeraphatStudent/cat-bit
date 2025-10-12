@@ -80,13 +80,56 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.transaction-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
 }
 
 .transaction-type {
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
-  margin-bottom: var(--space-xs);
+}
+
+.game-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs);
+  background: var(--color-background);
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--color-border);
+}
+
+.game-thumbnail {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--color-secondary-2);
+}
+
+.game-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.game-name {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.game-type {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .transaction-date {

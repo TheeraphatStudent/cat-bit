@@ -1,0 +1,94 @@
+<div class="success-container">
+  <!-- Confetti Animation -->
+  <div class="confetti-container" *ngIf="confettiActive">
+    <div class="confetti" *ngFor="let i of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]"></div>
+  </div>
+
+  <div class="success-content pixel-corners-2">
+    <!-- Success Icon -->
+    <div class="success-icon-wrapper">
+      <div class="success-icon pixel-corners-3">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Success Message -->
+    <div class="success-message">
+      <h1 class="success-title">Purchase Successful!</h1>
+      <p class="success-subtitle">Thank you for your purchase. Your games are now available in your library.</p>
+    </div>
+
+    <!-- Purchase Summary -->
+    <div class="purchase-summary pixel-corners-2" *ngIf="!loading">
+      <h2 class="summary-title">Order Summary</h2>
+      
+      <div class="purchased-games">
+        <div class="game-item pixel-corners-3" *ngFor="let game of purchasedGames">
+          <img [src]="game.image" 
+               [alt]="game.name"
+               class="game-image"
+               onerror="this.src='/assets/default-game.jpg'">
+          <div class="game-info">
+            <h3 class="game-name">{{game.name}}</h3>
+            <p class="game-type">{{game.type}}</p>
+          </div>
+          <div class="game-price">{{formatPrice(game.price)}}</div>
+        </div>
+      </div>
+
+      <div class="summary-totals">
+        <div class="total-row" *ngIf="discountApplied > 0">
+          <span>Discount Applied:</span>
+          <span class="discount-amount">-{{formatPrice(discountApplied)}}</span>
+        </div>
+        <div class="total-row final-total">
+          <span>Total Paid:</span>
+          <span class="total-amount">{{formatPrice(totalAmount)}}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-summary" *ngIf="loading">
+      <div class="spinner"></div>
+      <p>Loading purchase details...</p>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="primary-btn pixel-corners-2" (click)="navigateToLibrary()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+        </svg>
+        Go to Library
+      </button>
+      <button class="secondary-btn pixel-corners-2" (click)="navigateToStore()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="21" r="1"/>
+          <circle cx="20" cy="21" r="1"/>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+        </svg>
+        Continue Shopping
+      </button>
+      <button class="tertiary-btn pixel-corners-2" (click)="navigateToProfile()">
+        View Transaction History
+      </button>
+    </div>
+
+    <!-- Additional Info -->
+    <div class="additional-info">
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="16" x2="12" y2="12"/>
+          <line x1="12" y1="8" x2="12.01" y2="8"/>
+        </svg>
+        You can download and play your games anytime from your library.
+      </p>
+    </div>
+  </div>
+</div>

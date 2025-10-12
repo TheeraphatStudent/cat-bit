@@ -13,9 +13,21 @@
       </div>
       
       <div class="transaction-details">
-        <span class="transaction-type">
-          {{transaction.type === 'topup' ? 'Wallet Top Up' : 'Game Purchase'}}
-        </span>
+        <div class="transaction-info">
+          <span class="transaction-type">
+            {{transaction.type === 'topup' ? 'Wallet Top Up' : 'Game Purchase'}}
+          </span>
+          <div *ngIf="transaction.game" class="game-info">
+            <img [src]="transaction.game.image" 
+                 [alt]="transaction.game.name"
+                 class="game-thumbnail"
+                 onerror="this.src='/assets/default-game.jpg'">
+            <div class="game-details">
+              <span class="game-name">{{transaction.game.name}}</span>
+              <span class="game-type">{{transaction.game.type}}</span>
+            </div>
+          </div>
+        </div>
         <span class="transaction-date">
           {{formatDateTime(transaction.transactionDate!)}}
         </span>

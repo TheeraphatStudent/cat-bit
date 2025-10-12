@@ -3,6 +3,14 @@ export interface WalletTransaction {
   userId: number;
   type: 'topup' | 'purchase';
   amount: number;
+  gameId?: number;
+  game?: {
+    id: number;
+    name: string;
+    price: number;
+    type: string;
+    image: string;
+  };
   transactionDate?: Date;
 }
 

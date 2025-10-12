@@ -88,6 +88,8 @@ export class CartComponent implements OnInit {
 
     this.checkingOut = true;
     const gameIds = this.cart.items.map(item => item.game.id!);
+    const totalAmount = this.cart.total;
+    const discountAmount = this.cart.discountAmount || 0;
     
     this.cartService.checkout({
       gameIds,
@@ -95,7 +97,14 @@ export class CartComponent implements OnInit {
     }).subscribe({
       next: () => {
         this.checkingOut = false;
-        this.router.navigate(['/library']);
+        // Navigate to success page with purchase details
+        this.router.navigate(['/purchase-success'], {
+          queryParams: {
+            gameIds: gameIds.join(','),
+            total: totalAmount,
+            discount: discountAmount
+          }
+        });
       },
       error: (error) => {
         this.checkingOut = false;

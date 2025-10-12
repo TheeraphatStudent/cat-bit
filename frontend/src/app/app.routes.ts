@@ -44,6 +44,11 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
+    path: 'purchase-success',
+    loadComponent: () => import('./pages/purchase-success/purchase-success.component').then(m => m.PurchaseSuccessComponent),
+    canActivate: [AuthGuard]
+  },
+  {
     path: 'admin-dashboard',
     loadComponent: () => import('./pages/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
     canActivate: [AuthGuard, RoleGuard]

@@ -1,4 +1,4 @@
-@import '../../../styles/design-tokens.css';
+@import "../../../styles/design-tokens.css";
 
 .admin-container {
   max-width: 1400px;
@@ -67,15 +67,27 @@
 }
 
 .games-icon {
-  background: linear-gradient(135deg, var(--color-success), color-mix(in srgb, var(--color-success) 80%, white 20%));
+  background: linear-gradient(
+    135deg,
+    var(--color-success),
+    color-mix(in srgb, var(--color-success) 80%, white 20%)
+  );
 }
 
 .sales-icon {
-  background: linear-gradient(135deg, var(--color-warning), color-mix(in srgb, var(--color-warning) 80%, white 20%));
+  background: linear-gradient(
+    135deg,
+    var(--color-warning),
+    color-mix(in srgb, var(--color-warning) 80%, white 20%)
+  );
 }
 
 .revenue-icon {
-  background: linear-gradient(135deg, var(--color-info), color-mix(in srgb, var(--color-info) 80%, white 20%));
+  background: linear-gradient(
+    135deg,
+    var(--color-info),
+    color-mix(in srgb, var(--color-info) 80%, white 20%)
+  );
 }
 
 .stat-info h3 {
@@ -179,7 +191,9 @@
   box-shadow: var(--shadow-md);
 }
 
-.games-table, .users-table, .discounts-table {
+.games-table,
+.users-table,
+.discounts-table {
   overflow-x: auto;
 }
 
@@ -188,7 +202,8 @@ table {
   border-collapse: collapse;
 }
 
-th, td {
+th,
+td {
   padding: var(--space-sm);
   text-align: left;
   border-bottom: 2px solid var(--color-border);
@@ -243,7 +258,9 @@ tbody tr:hover {
   flex-wrap: wrap;
 }
 
-.edit-btn, .delete-btn, .role-btn {
+.edit-btn,
+.delete-btn,
+.edit-btn {
   padding: var(--space-xs) var(--space-sm);
   border: 2px solid;
   font-size: var(--font-size-xs);
@@ -276,13 +293,13 @@ tbody tr:hover {
   transform: translateY(-1px);
 }
 
-.role-btn {
+.edit-btn {
   background: var(--color-success);
   color: white;
   border-color: color-mix(in srgb, var(--color-success) 80%, black 20%);
 }
 
-.role-btn:hover {
+.edit-btn:hover {
   background: color-mix(in srgb, var(--color-success) 80%, white 20%);
   transform: translateY(-1px);
 }
@@ -362,7 +379,9 @@ tbody tr:hover {
   letter-spacing: 0.5px;
 }
 
-.form-group input, .form-group select, .form-group textarea {
+.form-group input,
+.form-group select,
+.form-group textarea {
   width: 100%;
   padding: var(--space-sm) var(--space-md);
   border: 3px solid var(--color-secondary-2);
@@ -372,7 +391,9 @@ tbody tr:hover {
   color: var(--color-text-primary);
 }
 
-.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
   outline: none;
   border-color: var(--color-primary-2);
   box-shadow: 0 0 0 3px rgba(249, 195, 62, 0.2);
@@ -384,7 +405,8 @@ tbody tr:hover {
   margin-top: var(--space-lg);
 }
 
-.cancel-btn, .save-btn {
+.cancel-btn,
+.save-btn {
   flex: 1;
   padding: var(--space-sm) var(--space-md);
   border: 3px solid;
@@ -432,6 +454,70 @@ tbody tr:hover {
   font-size: var(--font-size-lg);
 }
 
+.view-btn {
+  padding: var(--space-xs) var(--space-md);
+  border: 2px solid var(--color-secondary-2);
+  background: var(--color-primary-1);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.view-btn:hover {
+  background: var(--color-primary-2);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.modal-content {
+  padding: var(--space-lg);
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.image-preview {
+  margin-top: var(--space-sm);
+  border: 2px solid var(--color-secondary-2);
+  padding: var(--space-sm);
+  display: inline-block;
+}
+
+.game-types-table {
+  overflow-x: auto;
+}
+
+.game-types-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.game-types-table th,
+.game-types-table td {
+  padding: var(--space-md);
+  text-align: left;
+  border-bottom: 2px solid var(--color-secondary-2);
+}
+
+.game-types-table th {
+  background: var(--color-secondary-1);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  font-size: var(--font-size-sm);
+  letter-spacing: 0.5px;
+}
+
+.game-types-table tbody tr {
+  transition: background var(--transition-base);
+}
+
+.game-types-table tbody tr:hover {
+  background: var(--color-secondary-1);
+}
+
 @media (max-width: 768px) {
   .admin-container {
     padding: var(--space-md);
@@ -440,30 +526,33 @@ tbody tr:hover {
   .dashboard-stats {
     grid-template-columns: 1fr;
   }
-  
+
   .admin-tabs {
     flex-direction: column;
   }
-  
+
   .section-header {
     flex-direction: column;
     gap: var(--space-md);
     align-items: stretch;
   }
-  
+
   .search-box {
     max-width: 100%;
   }
-  
+
   .action-buttons {
     flex-direction: column;
   }
-  
-  .games-table, .users-table, .discounts-table {
+
+  .games-table,
+  .users-table,
+  .discounts-table {
     font-size: var(--font-size-xs);
   }
-  
-  th, td {
+
+  th,
+  td {
     padding: var(--space-xs);
   }
 }
