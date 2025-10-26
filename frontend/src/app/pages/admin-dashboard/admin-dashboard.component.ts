@@ -6,6 +6,7 @@ import { GameService } from '../../services/game.service';
 import { DiscountService } from '../../services/discount.service';
 import { ImageUploadService } from '../../services/image-upload.service';
 import { GameTypeService } from '../../services/game-type.service';
+import { PixelAlertService } from '../../services/pixel-alert.service';
 import { Game } from '../../models/game.model';
 import { User } from '../../models/user.model';
 import { DiscountCode } from '../../models/discount.model';
@@ -78,7 +79,8 @@ export class AdminDashboardComponent implements OnInit {
     private gameService: GameService,
     private discountService: DiscountService,
     private imageUploadService: ImageUploadService,
-    private gameTypeService: GameTypeService
+    private gameTypeService: GameTypeService,
+    private alertService: PixelAlertService
   ) {
     this.gameForm = this.fb.group({
       name: ['', Validators.required],
@@ -363,10 +365,10 @@ export class AdminDashboardComponent implements OnInit {
             const gameData = { ...this.gameForm.value, image: response.data.url };
             this.saveGameData(gameData);
           },
-          error: () => {
+          error: (err) => {
             this.uploadingImage = false;
             this.saving = false;
-            alert('Failed to upload image');
+            this.alertService.error(err.error?.message || 'Failed to upload image', 'Error');
           }
         });
       } else {
@@ -381,10 +383,13 @@ export class AdminDashboardComponent implements OnInit {
         next: () => {
           this.saving = false;
           this.closeGameModal();
+          this.lastGamesLoad = 0; // Force refresh
           this.loadGames();
+          this.alertService.success('Game updated successfully!', 'Success');
         },
-        error: () => {
+        error: (err) => {
           this.saving = false;
+          this.alertService.error(err.error?.message || 'Failed to update game', 'Error');
         }
       });
     } else {
@@ -392,10 +397,13 @@ export class AdminDashboardComponent implements OnInit {
         next: () => {
           this.saving = false;
           this.closeGameModal();
+          this.lastGamesLoad = 0; // Force refresh
           this.loadGames();
+          this.alertService.success('Game created successfully!', 'Success');
         },
-        error: () => {
+        error: (err) => {
           this.saving = false;
+          this.alertService.error(err.error?.message || 'Failed to create game', 'Error');
         }
       });
     }
@@ -405,7 +413,12 @@ export class AdminDashboardComponent implements OnInit {
     if (confirm(`Are you sure you want to delete "${game.name}"?`)) {
       this.gameService.deleteGame(game.id!).subscribe({
         next: () => {
+          this.lastGamesLoad = 0; // Force refresh
           this.loadGames();
+          this.alertService.success(`Game "${game.name}" deleted successfully!`, 'Success');
+        },
+        error: (err) => {
+          this.alertService.error(err.error?.message || 'Failed to delete game', 'Error');
         }
       });
     }
@@ -416,7 +429,12 @@ export class AdminDashboardComponent implements OnInit {
     const newRole = user.role === 'admin' ? 'user' : 'admin';
     this.adminService.updateUserRole(user.id!, newRole).subscribe({
       next: () => {
+        this.lastUsersLoad = 0; // Force refresh
         this.loadUsers();
+        this.alertService.success(`User role updated to ${newRole}`, 'Success');
+      },
+      error: (err) => {
+        this.alertService.error(err.error?.message || 'Failed to update user role', 'Error');
       }
     });
   }
@@ -436,7 +454,12 @@ export class AdminDashboardComponent implements OnInit {
     if (confirm(`Are you sure you want to delete user "${user.username}"?`)) {
       this.adminService.deleteUser(user.id!).subscribe({
         next: () => {
+          this.lastUsersLoad = 0; // Force refresh
           this.loadUsers();
+          this.alertService.success(`User "${user.username}" deleted successfully!`, 'Success');
+        },
+        error: (err) => {
+          this.alertService.error(err.error?.message || 'Failed to delete user', 'Error');
         }
       });
     }
@@ -456,10 +479,13 @@ export class AdminDashboardComponent implements OnInit {
         next: () => {
           this.saving = false;
           this.closeUserModel();
+          this.lastUsersLoad = 0; // Force refresh
           this.loadUsers();
+          this.alertService.success('User updated successfully!', 'Success');
         },
-        error: () => {
+        error: (err) => {
           this.saving = false;
+          this.alertService.error(err.error?.message || 'Failed to update user', 'Error');
         }
       });
     }
@@ -498,9 +524,9 @@ export class AdminDashboardComponent implements OnInit {
     this.editingDiscount = discount;
     this.discountForm.patchValue({
       code: discount.code,
-      discountValue: discount.discountValue,
-      maxUsage: discount.maxUsage,
-      expireDate: discount.expireDate ? new Date(discount.expireDate).toISOString().split('T')[0] : ''
+      discountValue: discount.discount_value,
+      maxUsage: discount.max_usage,
+      expireDate: discount.expire_date ? new Date(discount.expire_date).toISOString().split('T')[0] : ''
     });
     this.showDiscountModal = true;
   }
@@ -520,10 +546,13 @@ export class AdminDashboardComponent implements OnInit {
           next: () => {
             this.saving = false;
             this.closeDiscountModal();
+            this.lastDiscountsLoad = 0; // Force refresh
             this.loadDiscountCodes();
+            this.alertService.success('Discount code updated successfully!', 'Success');
           },
-          error: () => {
+          error: (err) => {
             this.saving = false;
+            this.alertService.error(err.error?.message || 'Failed to update discount code', 'Error');
           }
         });
       } else {
@@ -531,10 +560,13 @@ export class AdminDashboardComponent implements OnInit {
           next: () => {
             this.saving = false;
             this.closeDiscountModal();
+            this.lastDiscountsLoad = 0; // Force refresh
             this.loadDiscountCodes();
+            this.alertService.success('Discount code created successfully!', 'Success');
           },
-          error: () => {
+          error: (err) => {
             this.saving = false;
+            this.alertService.error(err.error?.message || 'Failed to create discount code', 'Error');
           }
         });
       }
@@ -545,7 +577,12 @@ export class AdminDashboardComponent implements OnInit {
     if (confirm(`Are you sure you want to delete discount code "${discount.code}"?`)) {
       this.discountService.deleteDiscountCode(discount.id!).subscribe({
         next: () => {
+          this.lastDiscountsLoad = 0; // Force refresh
           this.loadDiscountCodes();
+          this.alertService.success(`Discount code "${discount.code}" deleted successfully!`, 'Success');
+        },
+        error: (err) => {
+          this.alertService.error(err.error?.message || 'Failed to delete discount code', 'Error');
         }
       });
     }
@@ -581,10 +618,13 @@ export class AdminDashboardComponent implements OnInit {
           next: () => {
             this.saving = false;
             this.closeGameTypeModal();
+            this.lastGameTypesLoad = 0; // Force refresh
             this.loadGameTypes();
+            this.alertService.success('Game type updated successfully!', 'Success');
           },
-          error: () => {
+          error: (err) => {
             this.saving = false;
+            this.alertService.error(err.error?.message || 'Failed to update game type', 'Error');
           }
         });
       } else {
@@ -592,10 +632,13 @@ export class AdminDashboardComponent implements OnInit {
           next: () => {
             this.saving = false;
             this.closeGameTypeModal();
+            this.lastGameTypesLoad = 0; // Force refresh
             this.loadGameTypes();
+            this.alertService.success('Game type created successfully!', 'Success');
           },
-          error: () => {
+          error: (err) => {
             this.saving = false;
+            this.alertService.error(err.error?.message || 'Failed to create game type', 'Error');
           }
         });
       }
@@ -606,10 +649,12 @@ export class AdminDashboardComponent implements OnInit {
     if (confirm(`Are you sure you want to delete game type "${gameType.name}"?`)) {
       this.gameTypeService.deleteGameType(gameType.id!).subscribe({
         next: () => {
+          this.lastGameTypesLoad = 0; // Force refresh
           this.loadGameTypes();
+          this.alertService.success(`Game type "${gameType.name}" deleted successfully!`, 'Success');
         },
         error: (err) => {
-          alert(err.error?.message || 'Failed to delete game type');
+          this.alertService.error(err.error?.message || 'Failed to delete game type', 'Error');
         }
       });
     }

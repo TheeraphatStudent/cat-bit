@@ -9,6 +9,7 @@ export interface Game {
   salesCount?: number;
   rank?: number;
   purchaseDate?: Date;
+  isPurchased?: boolean;
 }
 
 export interface LibraryGame extends Game {

@@ -22,6 +22,7 @@ const upload = multer({ storage: storage });
 router.get('/', async (req, res) => {
   try {
     const { name, type, minPrice, maxPrice } = req.query;
+    const userId = req.user?.id;
 
     let query = `
       SELECT
@@ -34,6 +35,7 @@ router.get('/', async (req, res) => {
         g.release_date AS "releaseDate",
         COALESCE(g.sales_count, 0) AS "salesCount",
         ROW_NUMBER() OVER (ORDER BY g.sales_count DESC, g.release_date DESC) AS "rank"
+        ${userId ? `, EXISTS(SELECT 1 FROM purchases p WHERE p.user_id = ${userId} AND p.game_id = g.id) AS "isPurchased"` : ', false AS "isPurchased"'}
       FROM games g
       WHERE 1 = 1
     `;
@@ -103,11 +105,11 @@ router.get('/library', authMiddleware, async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const gameId = parseInt(req.params.id);
-    
+
     if (isNaN(gameId)) {
       return res.status(400).json({ message: 'Invalid game ID' });
     }
-    
+
     const result = await pool.query(`
       SELECT
         id,
@@ -121,7 +123,7 @@ router.get('/:id', async (req, res) => {
       FROM games
       WHERE id = $1
     `, [gameId]);
-    
+
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'Game not found' });
     }
@@ -246,11 +248,11 @@ router.delete('/:id', authMiddleware, roleMiddleware(['admin']), async (req, res
 router.post('/:id/upload-image', authMiddleware, roleMiddleware(['admin']), upload.single('image'), async (req, res) => {
   try {
     const gameId = parseInt(req.params.id);
-    
+
     if (isNaN(gameId)) {
       return res.status(400).json({ message: 'Invalid game ID' });
     }
-    
+
     if (!req.file) {
       return res.status(400).json({ message: 'No image file provided' });
     }

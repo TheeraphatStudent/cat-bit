@@ -486,38 +486,6 @@ tbody tr:hover {
   display: inline-block;
 }
 
-.game-types-table {
-  overflow-x: auto;
-}
-
-.game-types-table table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.game-types-table th,
-.game-types-table td {
-  padding: var(--space-md);
-  text-align: left;
-  border-bottom: 2px solid var(--color-secondary-2);
-}
-
-.game-types-table th {
-  background: var(--color-secondary-1);
-  font-weight: var(--font-weight-bold);
-  text-transform: uppercase;
-  font-size: var(--font-size-sm);
-  letter-spacing: 0.5px;
-}
-
-.game-types-table tbody tr {
-  transition: background var(--transition-base);
-}
-
-.game-types-table tbody tr:hover {
-  background: var(--color-secondary-1);
-}
-
 @media (max-width: 768px) {
   .admin-container {
     padding: var(--space-md);

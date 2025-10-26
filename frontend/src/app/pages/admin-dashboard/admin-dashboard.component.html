@@ -129,7 +129,8 @@
             <td>
               <div class="action-buttons">
                 <button class="edit-btn" (click)="toggleUserEdited(user)">Edit</button>
-                <button class="view-btn" (click)="viewUserTransactions(user)" style="background: #3b82f6;">History</button>
+                <button class="view-btn" (click)="viewUserTransactions(user)"
+                  style="background: #3b82f6;">History</button>
                 <button class="delete-btn" (click)="deleteUser(user)">Delete</button>
               </div>
             </td>
@@ -163,10 +164,10 @@
         <tbody>
           <tr *ngFor="let discount of discountCodes">
             <td><code>{{discount.code}}</code></td>
-            <td>{{discount.discountValue}}%</td>
-            <td>{{discount.maxUsage}}</td>
-            <td>{{discount.usedCount}}</td>
-            <td>{{discount.expireDate ? formatDate(discount.expireDate) : 'Never'}}</td>
+            <td>{{discount.discount_value}}%</td>
+            <td>{{discount.max_usage}}</td>
+            <td>{{discount.used_count}}</td>
+            <td>{{discount.expire_date ? formatDate(discount.expire_date) : 'Never'}}</td>
             <td>
               <div class="action-buttons">
                 <button class="edit-btn" (click)="editDiscount(discount)">Edit</button>
@@ -360,10 +361,9 @@
               </td>
               <td>
                 <div *ngIf="transaction.game" style="display: flex; align-items: center; gap: 8px;">
-                  <img [src]="transaction.game.image" 
-                       [alt]="transaction.game.name"
-                       style="width: 40px; height: 40px; object-fit: cover; border: 2px solid var(--color-secondary-2);"
-                       onerror="this.src='/assets/default-game.jpg'">
+                  <img [src]="transaction.game.image" [alt]="transaction.game.name"
+                    style="width: 40px; height: 40px; object-fit: cover; border: 2px solid var(--color-secondary-2);"
+                    onerror="this.src='/assets/default-game.jpg'">
                   <div>
                     <div style="font-weight: bold;">{{transaction.game.name}}</div>
                     <div style="font-size: 0.85em; color: var(--color-text-secondary);">{{transaction.game.type}}</div>
@@ -372,7 +372,7 @@
                 <span *ngIf="!transaction.game" style="color: var(--color-text-secondary);">-</span>
               </td>
               <td>{{formatPrice(transaction.amount)}}</td>
-              <td>{{formatDate(transaction.transactionDate!)}}</td>
+              <td>{{formatDate(transaction.transaction_date!)}}</td>
             </tr>
           </tbody>
         </table>

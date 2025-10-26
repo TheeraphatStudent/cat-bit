@@ -11,7 +11,7 @@ export interface WalletTransaction {
     type: string;
     image: string;
   };
-  transactionDate?: Date;
+  transaction_date?: Date;
 }
 
 export interface TopupRequest {
