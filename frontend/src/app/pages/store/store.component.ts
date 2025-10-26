@@ -3,46 +3,59 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GameCardComponent } from '../../components/game-card/game-card.component';
 import { GameDetailComponent } from '../../components/game-detail/game-detail.component';
+import { SkeletonCardComponent } from '../../components/skeleton-card/skeleton-card.component';
 import { GameService } from '../../services/game.service';
 import { CartService } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
+import { GameTypeService } from '../../services/game-type.service';
 import { Game, GameFilter } from '../../models/game.model';
+import { GameType } from '../../models/game-type.model';
 
 @Component({
   selector: 'app-store',
   standalone: true,
-  imports: [CommonModule, FormsModule, GameCardComponent, GameDetailComponent],
+  imports: [CommonModule, FormsModule, GameCardComponent, GameDetailComponent, SkeletonCardComponent],
   templateUrl: './store.component.html',
   styleUrls: ['./store.component.css']
 })
 export class StoreComponent implements OnInit {
   games: Game[] = [];
+  visibleGames: Game[] = [];
   selectedGame: Game | null = null;
   loading = false;
   filter: GameFilter = {};
   cartItems: number[] = [];
   ownedGames: number[] = [];
+  gameTypes: GameType[] = [];
 
   constructor(
     private gameService: GameService,
     private cartService: CartService,
-    private authService: AuthService
+    private authService: AuthService,
+    private gameTypeService: GameTypeService
   ) {}
 
   ngOnInit(): void {
+    this.loadGameTypes();
     this.loadGames();
     this.loadCartItems();
     this.loadOwnedGames();
+  }
+
+  loadGameTypes(): void {
+    this.gameTypeService.getGameTypes().subscribe({
+      next: (types) => {
+        this.gameTypes = types;
+      }
+    });
   }
 
   loadGames(): void {
     this.loading = true;
     this.gameService.getGames(this.filter).subscribe({
       next: (games) => {
-        this.games = games.map((game, index) => ({
-          ...game,
-          rank: index + 1
-        }));
+        this.games = games;
+        this.updateVisibleGames();
         this.loading = false;
       },
       error: () => {
@@ -66,6 +79,7 @@ export class StoreComponent implements OnInit {
       this.gameService.getUserLibrary().subscribe({
         next: (ownedGames) => {
           this.ownedGames = ownedGames.map(game => game.id!);
+          this.updateVisibleGames();
         }
       });
     }
@@ -102,6 +116,9 @@ export class StoreComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error adding to cart:', error);
+        if (error?.error?.message === 'You already own this game') {
+          this.loadOwnedGames();
+        }
       }
     });
   }
@@ -112,5 +129,17 @@ export class StoreComponent implements OnInit {
 
   isOwned(gameId: number): boolean {
     return this.ownedGames.includes(gameId);
+  }
+
+  private updateVisibleGames(): void {
+    const filtered = this.games.filter(game => !(game.id && this.isOwned(game.id)));
+    this.visibleGames = filtered.map((game, index) => ({
+      ...game,
+      rank: index + 1
+    }));
+
+    if (this.selectedGame?.id && this.isOwned(this.selectedGame.id)) {
+      this.closeGameDetail();
+    }
   }
 }

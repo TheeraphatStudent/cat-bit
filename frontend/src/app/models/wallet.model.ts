@@ -3,7 +3,15 @@ export interface WalletTransaction {
   userId: number;
   type: 'topup' | 'purchase';
   amount: number;
-  transactionDate?: Date;
+  gameId?: number;
+  game?: {
+    id: number;
+    name: string;
+    price: number;
+    type: string;
+    image: string;
+  };
+  transaction_date?: Date;
 }
 
 export interface TopupRequest {

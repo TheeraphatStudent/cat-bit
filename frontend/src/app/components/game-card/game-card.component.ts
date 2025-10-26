@@ -6,6 +6,21 @@ import { PriceFormat } from '../../utils/price-format';
 import { DateFormat } from '../../utils/date-format';
 import { AuthService } from '../../services/auth.service';
 
+/*
+{
+        "id": 3,
+        "name": "Call of Duty: Modern Warfare",
+        "price": "49.99",
+        "type": "Action",
+        "description": "The stakes have never been higher as players take on the role of lethal Tier One operators.",
+        "image": "https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg",
+        "releaseDate": "2025-10-12T22:40:01.938Z",
+        "salesCount": 23458,
+        "rank": "2",
+        "isPurchased": false
+    },
+*/
+
 @Component({
   selector: 'app-game-card',
   standalone: true,
@@ -23,7 +38,7 @@ export class GameCardComponent {
   constructor(
     private authService: AuthService,
     private router: Router
-  ) {}
+  ) { }
 
   formatPrice(price: number): string {
     return PriceFormat.formatCurrency(price);
@@ -43,17 +58,21 @@ export class GameCardComponent {
   }
 
   onCardClick(): void {
+    if (this.game.isPurchased || this.owned) {
+      this.router.navigate(['/your-games']);
+      return;
+    }
     this.cardClick.emit(this.game);
   }
 
   onAddToCart(event: Event): void {
     event.stopPropagation();
-    
+
     if (!this.isAuthenticated()) {
       this.router.navigate(['/login']);
       return;
     }
-    
+
     this.addToCart.emit(this.game);
   }
 

@@ -68,7 +68,28 @@ router.get('/transactions', authMiddleware, async (req, res) => {
     const userId = req.user.id;
 
     const result = await pool.query(
-      'SELECT * FROM wallet_transactions WHERE user_id = $1 ORDER BY transaction_date DESC LIMIT 50',
+      `SELECT 
+        wt.id,
+        wt.user_id,
+        wt.type,
+        wt.amount,
+        wt.game_id,
+        wt.transaction_date,
+        CASE 
+          WHEN wt.game_id IS NOT NULL THEN json_build_object(
+            'id', g.id,
+            'name', g.name,
+            'price', g.price,
+            'type', g.type,
+            'image', g.image
+          )
+          ELSE NULL
+        END as game
+      FROM wallet_transactions wt
+      LEFT JOIN games g ON wt.game_id = g.id
+      WHERE wt.user_id = $1 
+      ORDER BY wt.transaction_date DESC 
+      LIMIT 50`,
       [userId]
     );
 

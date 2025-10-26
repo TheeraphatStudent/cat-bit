@@ -1,7 +1,12 @@
+@import '../../../styles/design-tokens.css';
+
 .cart-container {
   max-width: 1200px;
-  margin: 0 auto;
-  padding: var(--space-lg);
+  margin: 0 auto var(--space-2xl);
+  padding: var(--space-xl);
+  background: var(--color-surface);
+  border: 3px solid var(--color-secondary-2);
+  box-shadow: var(--shadow-lg);
 }
 
 .cart-header {
@@ -33,15 +38,16 @@
 
 .cart-items {
   background: var(--color-background);
-  border-radius: var(--radius-lg);
   padding: var(--space-lg);
+  border: 3px solid var(--color-secondary-2);
+  box-shadow: var(--shadow-md);
 }
 
 .summary-card {
   background: var(--color-surface);
-  border-radius: var(--radius-lg);
   padding: var(--space-lg);
   box-shadow: var(--shadow-md);
+  border: 3px solid var(--color-secondary-2);
   position: sticky;
   top: var(--space-lg);
 }
@@ -74,8 +80,7 @@
 .discount-input {
   flex: 1;
   padding: var(--space-sm) var(--space-sm);
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  border: 3px solid var(--color-secondary-2);
   font-size: var(--font-size-sm);
 }
 
@@ -88,8 +93,7 @@
   padding: var(--space-sm) var(--space-md);
   background: var(--gradient-primary-135);
   color: white;
-  border: none;
-  border-radius: var(--radius-sm);
+  border: 3px solid var(--color-secondary-2);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
   transition: all var(--transition-base);
@@ -140,7 +144,7 @@
   margin-bottom: var(--space-lg);
   padding: var(--space-md);
   background: var(--color-background);
-  border-radius: var(--radius-md);
+  border: 3px solid var(--color-secondary-2);
 }
 
 .wallet-balance {
@@ -167,8 +171,7 @@
 
 .checkout-btn, .clear-cart-btn {
   padding: var(--space-md);
-  border: none;
-  border-radius: var(--radius-md);
+  border: 3px solid var(--color-secondary-2);
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
@@ -230,8 +233,7 @@
   padding: var(--space-md) var(--space-xl);
   background: var(--gradient-primary-135);
   color: white;
-  border: none;
-  border-radius: var(--radius-md);
+  border: 3px solid var(--color-secondary-2);
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;

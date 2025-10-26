@@ -27,13 +27,86 @@ router.get('/users/:userId/transactions', async (req, res) => {
     const userId = parseInt(req.params.userId);
 
     const result = await pool.query(
-      'SELECT * FROM wallet_transactions WHERE user_id = $1 ORDER BY transaction_date DESC',
+      `SELECT 
+        wt.id,
+        wt.user_id,
+        wt.type,
+        wt.amount,
+        wt.game_id,
+        wt.transaction_date,
+        CASE 
+          WHEN wt.game_id IS NOT NULL THEN json_build_object(
+            'id', g.id,
+            'name', g.name,
+            'price', g.price,
+            'type', g.type,
+            'image', g.image
+          )
+          ELSE NULL
+        END as game
+      FROM wallet_transactions wt
+      LEFT JOIN games g ON wt.game_id = g.id
+      WHERE wt.user_id = $1 
+      ORDER BY wt.transaction_date DESC`,
       [userId]
     );
 
     res.json(result.rows);
   } catch (error) {
     console.error('Get user transactions error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+router.put('/users/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const { username, email, role, wallet_balance } = req.body;
+
+    // Build dynamic update query
+    const updates = [];
+    const values = [];
+    let paramCount = 1;
+
+    if (username !== undefined) {
+      updates.push(`username = $${paramCount++}`);
+      values.push(username);
+    }
+    if (email !== undefined) {
+      updates.push(`email = $${paramCount++}`);
+      values.push(email);
+    }
+    if (role !== undefined) {
+      if (!['user', 'admin'].includes(role)) {
+        return res.status(400).json({ message: 'Invalid role' });
+      }
+      updates.push(`role = $${paramCount++}`);
+      values.push(role);
+    }
+    if (wallet_balance !== undefined) {
+      updates.push(`wallet_balance = $${paramCount++}`);
+      values.push(wallet_balance);
+    }
+
+    if (updates.length === 0) {
+      return res.status(400).json({ message: 'No fields to update' });
+    }
+
+    values.push(userId);
+    const query = `UPDATE users SET ${updates.join(', ')} WHERE id = $${paramCount} RETURNING id, username, email, role, profile_image, wallet_balance, created_at`;
+
+    const result = await pool.query(query, values);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Update user error:', error);
+    if (error.code === '23505') {
+      return res.status(400).json({ message: 'Username or email already exists' });
+    }
     res.status(500).json({ message: 'Internal server error' });
   }
 });

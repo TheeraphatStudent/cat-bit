@@ -37,6 +37,14 @@
   margin-bottom: var(--space-lg);
 }
 
+.brand-logo img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(249, 195, 62, 0.3));
+  animation: float 3s ease-in-out infinite;
+}
+
 .logo-icon {
   width: 56px;
   height: 56px;

@@ -1,8 +1,8 @@
 export interface DiscountCode {
   id?: number;
   code: string;
-  discountValue: number;
-  maxUsage: number;
-  usedCount?: number;
-  expireDate?: Date;
+  discount_value: number;
+  max_usage: number;
+  used_count?: number;
+  expire_date?: Date;
 }

@@ -18,7 +18,7 @@ export class AuthService {
   }
 
   private loadUserFromStorage(): void {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (token) {
       this.getCurrentUser().subscribe();
     }
@@ -29,10 +29,10 @@ export class AuthService {
   }
 
   login(request: LoginRequest): Observable<User> {
-    return this.http.post<{user: User, token: string}>(`${this.apiUrl}/login`, request)
+    return this.http.post<{ user: User, token: string }>(`${this.apiUrl}/login`, request)
       .pipe(
         tap(response => {
-          localStorage.setItem('token', response.token);
+          sessionStorage.setItem('token', response.token);
           this.currentUserSubject.next(response.user);
         }),
         map(response => response.user)
@@ -40,7 +40,7 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
     this.currentUserSubject.next(null);
   }
 
@@ -52,6 +52,8 @@ export class AuthService {
   }
 
   updateProfile(user: Partial<User>): Observable<User> {
+    console.log(`User: `, user)
+
     return this.http.put<User>(`${this.apiUrl}/update`, user)
       .pipe(
         tap(updatedUser => this.currentUserSubject.next(updatedUser))
@@ -66,7 +68,7 @@ export class AuthService {
   }
 
   getToken(): string | null {
-    return localStorage.getItem('token');
+    return sessionStorage.getItem('token');
   }
 
   isAuthenticated(): boolean {

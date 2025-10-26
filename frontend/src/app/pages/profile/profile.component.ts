@@ -9,6 +9,9 @@ import { WalletService } from '../../services/wallet.service';
 import { User } from '../../models/user.model';
 import { WalletTransaction } from '../../models/wallet.model';
 import { CustomValidators } from '../../utils/validators';
+import { ImageUploadService } from '../../services/image-upload.service';
+import { finalize, switchMap } from 'rxjs/operators';
+import { decodeJWT } from '../../utils/json-helper';
 
 @Component({
   selector: 'app-profile',
@@ -19,7 +22,7 @@ import { CustomValidators } from '../../utils/validators';
 })
 export class ProfileComponent implements OnInit {
   @ViewChild('fileInput') fileInput!: ElementRef;
-  
+
   currentUser: User | null = null;
   profileForm: FormGroup;
   walletBalance = 0;
@@ -28,12 +31,16 @@ export class ProfileComponent implements OnInit {
   toppingUp = false;
   showDeleteModal = false;
   deleting = false;
+  uploadingImage = false;
+  imageUploadError = '';
+  readonly maxAvatarSize = 5 * 1024 * 1024; // 5 MB limit
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private walletService: WalletService,
-    private router: Router
+    private router: Router,
+    private imageUploadService: ImageUploadService
   ) {
     this.profileForm = this.fb.group({
       username: ['', [Validators.required, CustomValidators.usernameValidator()]],
@@ -55,7 +62,7 @@ export class ProfileComponent implements OnInit {
           username: user.username,
           email: user.email
         });
-        this.walletBalance = user.walletBalance || 0;
+        this.walletBalance = user.wallet_balance || 0;
       }
     });
   }
@@ -79,12 +86,16 @@ export class ProfileComponent implements OnInit {
   updateProfile(): void {
     if (this.profileForm.valid) {
       this.updating = true;
-      this.authService.updateProfile(this.profileForm.value).subscribe({
-        next: () => {
+      this.authService.updateProfile(this.profileForm.value).pipe(
+        switchMap(() => this.authService.getCurrentUser())
+      ).subscribe({
+        next: (updatedUser) => {
           this.updating = false;
+          console.log('Profile updated successfully:', updatedUser);
         },
-        error: () => {
+        error: (error) => {
           this.updating = false;
+          console.error('Profile update failed:', error);
         }
       });
     }
@@ -95,12 +106,59 @@ export class ProfileComponent implements OnInit {
   }
 
   onFileSelected(event: any): void {
-    const file = event.target.files[0];
-    if (file) {
-      // Here you would typically upload the file to your server
-      // For now, we'll just show a placeholder
-      console.log('File selected:', file.name);
+    const input = event.target as HTMLInputElement;
+    const file = input?.files?.[0];
+
+    if (!file) {
+      return;
     }
+
+    if (!file.type.startsWith('image/')) {
+      this.imageUploadError = 'Please select a valid image file.';
+      input.value = '';
+      return;
+    }
+
+    if (file.size > this.maxAvatarSize) {
+      this.imageUploadError = 'Image is too large. Please choose a file under 5MB.';
+      input.value = '';
+      return;
+    }
+
+    this.imageUploadError = '';
+    this.uploadingImage = true;
+
+    // Check if user is authenticated
+    if (!this.authService.isAuthenticated()) {
+      this.imageUploadError = 'Authentication required. Please log in again.';
+      this.uploadingImage = false;
+      input.value = '';
+      return;
+    }
+
+    this.imageUploadService.uploadImage(file).pipe(
+      switchMap(response => this.authService.updateProfile({
+        profileImage: response.data.url
+      })),
+      switchMap(() => this.authService.getCurrentUser()),
+      finalize(() => {
+        this.uploadingImage = false;
+        input.value = '';
+      })
+    ).subscribe({
+      next: (updatedUser) => {
+        this.imageUploadError = '';
+        console.log('Profile image updated successfully:', updatedUser);
+      },
+      error: (error) => {
+        console.error('Profile image update failed:', error);
+        this.imageUploadError = 'Unable to update profile image. Please try again.';
+      }
+    });
+  }
+
+  get profileImageUrl(): string {
+    return this.currentUser?.profileImage || '/assets/images/logo.png';
   }
 
   onTopUp(amount: number): void {

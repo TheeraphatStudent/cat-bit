@@ -1,7 +1,7 @@
 <div class="store-container">
 
   <div class="store-header pixel-corners-2">
-    <h1 class="store-title">Cat bit Store</h1>
+    <h1 class="store-title">Cat bit</h1>
     <p class="store-subtitle">Discover and purchase amazing games</p>
     <div class="filters-section pixel-corners-2">
       <!-- Main Search Bar -->
@@ -32,14 +32,7 @@
                   (ngModelChange)="onFilterChange()"
                   class="filter-select">
             <option value="">All Genres</option>
-            <option value="Action">Action</option>
-            <option value="Adventure">Adventure</option>
-            <option value="RPG">RPG</option>
-            <option value="Strategy">Strategy</option>
-            <option value="Sports">Sports</option>
-            <option value="Racing">Racing</option>
-            <option value="Puzzle">Puzzle</option>
-            <option value="Simulation">Simulation</option>
+            <option *ngFor="let type of gameTypes" [value]="type.name">{{type.name}}</option>
           </select>
         </div>
     
@@ -74,7 +67,7 @@
 
   <div class="games-grid pixel-corners-2" *ngIf="!selectedGame && !loading">
     <app-game-card 
-      *ngFor="let game of games" 
+      *ngFor="let game of visibleGames" 
       [game]="game"
       [inCart]="isInCart(game.id!)"
       [owned]="isOwned(game.id!)"
@@ -83,13 +76,12 @@
     </app-game-card>
   </div>
 
-  <div class="loading" *ngIf="loading">
-    <div class="loading-spinner"></div>
-    <p>Loading games...</p>
+  <div class="games-grid pixel-corners-2" *ngIf="loading">
+    <app-skeleton-card type="game" [count]="6"></app-skeleton-card>
   </div>
 
-  <div class="no-games" *ngIf="!loading && games.length === 0">
-    <p>No games found matching your criteria.</p>
+  <div class="no-games" *ngIf="!loading && visibleGames.length === 0">
+    <p>No games found matching your criteria. Owned titles now live in My Games.</p>
   </div>
 
   <div class="game-detail-overlay" *ngIf="selectedGame" (click)="closeGameDetail()">

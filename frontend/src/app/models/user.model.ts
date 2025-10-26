@@ -5,8 +5,8 @@ export interface User {
   password?: string;
   role: 'user' | 'admin';
   profileImage?: string;
-  walletBalance?: number;
-  createdAt: Date;
+  wallet_balance?: number;
+  created_at?: Date;
 }
 
 export interface LoginRequest {
@@ -18,4 +18,5 @@ export interface RegisterRequest {
   username: string;
   email: string;
   password: string;
+  profileImage?: string;
 }

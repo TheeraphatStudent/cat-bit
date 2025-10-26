@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yaml
+    kompose.version: 1.37.0 (fb0539e64)
+  labels:
+    app: catbit-web
+  name: catbit-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: catbit-web
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yaml
+        kompose.version: 1.37.0 (fb0539e64)
+      labels:
+        app: catbit-web
+    spec:
+      containers:
+        - image: gcr.io/lottocat/catbit-frontend:latest
+          imagePullPolicy: Always
+          name: catbit-web
+          ports:
+            - containerPort: 80
+              protocol: TCP
+      restartPolicy: Always

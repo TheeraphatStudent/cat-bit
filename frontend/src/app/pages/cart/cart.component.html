@@ -1,11 +1,11 @@
-<div class="cart-container">
+<div class="cart-container pixel-border">
   <div class="cart-header">
     <h1 class="cart-title">Shopping Cart</h1>
     <p class="cart-subtitle">Review your selected games</p>
   </div>
 
   <div class="cart-content" *ngIf="cart.items.length > 0; else emptyCart">
-    <div class="cart-items">
+    <div class="cart-items pixel-border">
       <app-cart-item 
         *ngFor="let item of cart.items" 
         [item]="item"
@@ -14,7 +14,7 @@
     </div>
 
     <div class="cart-summary">
-      <div class="summary-card">
+      <div class="summary-card pixel-border">
         <h3 class="summary-title">Order Summary</h3>
         
         <div class="discount-section">

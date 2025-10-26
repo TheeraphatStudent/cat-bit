@@ -52,8 +52,13 @@ router.post('/add', authMiddleware, async (req, res) => {
       return res.status(400).json({ message: 'Game ID is required' });
     }
 
+    const parsedGameId = parseInt(gameId);
+    if (isNaN(parsedGameId)) {
+      return res.status(400).json({ message: 'Invalid game ID' });
+    }
+
     // Check if game exists
-    const gameResult = await pool.query('SELECT * FROM games WHERE id = $1', [gameId]);
+    const gameResult = await pool.query('SELECT * FROM games WHERE id = $1', [parsedGameId]);
     if (gameResult.rows.length === 0) {
       return res.status(404).json({ message: 'Game not found' });
     }
@@ -61,7 +66,7 @@ router.post('/add', authMiddleware, async (req, res) => {
     // Check if user already owns this game
     const ownedCheck = await pool.query(
       'SELECT id FROM purchases WHERE user_id = $1 AND game_id = $2',
-      [userId, gameId]
+      [userId, parsedGameId]
     );
 
     if (ownedCheck.rows.length > 0) {
@@ -78,7 +83,7 @@ router.post('/add', authMiddleware, async (req, res) => {
           WHEN position($2 in user_sessions.cart_items) = 0 THEN user_sessions.cart_items || ',' || $2
           ELSE user_sessions.cart_items
         END
-    `, [userId, gameId.toString()]);
+    `, [userId, parsedGameId.toString()]);
 
     // Return updated cart
     const cartResult = await pool.query(`
@@ -86,9 +91,9 @@ router.post('/add', authMiddleware, async (req, res) => {
       FROM games g
       WHERE g.id = ANY(
         COALESCE(
-          (SELECT array_agg((unnest(string_to_array(cart_items, ','))::int))
+          (SELECT string_to_array(cart_items, ',')::int[]
            FROM user_sessions 
-           WHERE user_id = $1 AND cart_items IS NOT NULL),
+           WHERE user_id = $1 AND cart_items IS NOT NULL AND cart_items != ''),
           ARRAY[]::int[]
         )
       )
@@ -137,9 +142,9 @@ router.delete('/remove/:gameId', authMiddleware, async (req, res) => {
       FROM games g
       WHERE g.id = ANY(
         COALESCE(
-          (SELECT array_agg((unnest(string_to_array(cart_items, ','))::int))
+          (SELECT string_to_array(cart_items, ',')::int[]
            FROM user_sessions 
-           WHERE user_id = $1 AND cart_items IS NOT NULL),
+           WHERE user_id = $1 AND cart_items IS NOT NULL AND cart_items != ''),
           ARRAY[]::int[]
         )
       )
@@ -196,9 +201,9 @@ router.post('/discount', authMiddleware, async (req, res) => {
       FROM games g
       WHERE g.id = ANY(
         COALESCE(
-          (SELECT array_agg((unnest(string_to_array(cart_items, ','))::int))
+          (SELECT string_to_array(cart_items, ',')::int[]
            FROM user_sessions 
-           WHERE user_id = $1 AND cart_items IS NOT NULL),
+           WHERE user_id = $1 AND cart_items IS NOT NULL AND cart_items != ''),
           ARRAY[]::int[]
         )
       )
@@ -282,8 +287,11 @@ router.post('/checkout', authMiddleware, async (req, res) => {
         return res.status(400).json({ message: 'You already own some of these games' });
       }
 
-      // Create purchases
+      // Create purchases and wallet transactions for each game
       for (const gameId of gameIds) {
+        const game = gamesResult.rows.find(g => g.id === gameId);
+        const gamePrice = parseFloat(game.price);
+        
         await pool.query(
           'INSERT INTO purchases (user_id, game_id) VALUES ($1, $2)',
           [userId, gameId]
@@ -294,18 +302,18 @@ router.post('/checkout', authMiddleware, async (req, res) => {
           'UPDATE games SET sales_count = sales_count + 1 WHERE id = $1',
           [gameId]
         );
+
+        // Create wallet transaction for this specific game purchase
+        await pool.query(
+          'INSERT INTO wallet_transactions (user_id, type, amount, game_id) VALUES ($1, $2, $3, $4)',
+          [userId, 'purchase', gamePrice, gameId]
+        );
       }
 
       // Update user wallet balance
       await pool.query(
         'UPDATE users SET wallet_balance = wallet_balance - $1 WHERE id = $2',
         [totalCost, userId]
-      );
-
-      // Create wallet transaction
-      await pool.query(
-        'INSERT INTO wallet_transactions (user_id, type, amount) VALUES ($1, $2, $3)',
-        [userId, 'purchase', totalCost]
       );
 
       // Update discount code usage

@@ -1,67 +1,87 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { GameService } from '../../services/game.service';
-import { Game, LibraryGame } from '../../models/game.model';
-import { PriceFormat } from '../../utils/price-format';
+import { HttpClient } from '@angular/common/http';
+import { SkeletonCardComponent } from '../../components/skeleton-card/skeleton-card.component';
 import { DateFormat } from '../../utils/date-format';
+import { environment } from '../../../environments/environment';
+
+interface Coupon {
+  id: number;
+  code: string;
+  discount_value: number;
+  max_usage: number;
+  used_count: number;
+  expire_date: string | null;
+}
 
 @Component({
   selector: 'app-library',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SkeletonCardComponent],
   templateUrl: './library.component.html',
   styleUrls: ['./library.component.css']
 })
 export class LibraryComponent implements OnInit {
-  games: LibraryGame[] = [];
-  selectedGame: Game | null = null;
+  coupons: Coupon[] = [];
   loading = false;
+  copiedCode: string | null = null;
+  showToast = false;
+  errorMessage = '';
+  private apiUrl = `${environment.apiEndpoint}/discount`;
 
   constructor(
-    private gameService: GameService,
+    private http: HttpClient,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
-    this.loadLibrary();
+    this.loadCoupons();
   }
 
-  loadLibrary(): void {
+  loadCoupons(): void {
     this.loading = true;
-    this.gameService.getUserLibrary().subscribe({
-      next: (games) => {
-        this.games = games as LibraryGame[];
+    this.errorMessage = '';
+    // Use /available endpoint for regular users to see available coupons
+    this.http.get<Coupon[]>(`${this.apiUrl}/available`).subscribe({
+      next: (coupons) => {
+        this.coupons = coupons;
         this.loading = false;
       },
-      error: () => {
+      error: (error) => {
         this.loading = false;
+        this.errorMessage = error.error?.message || 'Failed to load coupons';
+        console.error('Load coupons error:', error);
       }
     });
   }
 
-  showGameDetails(game: Game): void {
-    this.selectedGame = game;
+  copyCouponCode(code: string, inputElement: HTMLInputElement): void {
+    inputElement.select();
+    navigator.clipboard.writeText(code).then(() => {
+      this.copiedCode = code;
+      this.showToast = true;
+
+      setTimeout(() => {
+        this.copiedCode = null;
+      }, 2000);
+
+      setTimeout(() => {
+        this.showToast = false;
+      }, 3000);
+    });
   }
 
-  closeGameDetail(): void {
-    this.selectedGame = null;
+  isExpired(expireDate: string | null): boolean {
+    if (!expireDate) return false;
+    return new Date(expireDate) < new Date();
   }
 
   navigateToStore(): void {
     this.router.navigate(['/store']);
   }
 
-  formatPrice(price: number): string {
-    return PriceFormat.formatCurrency(price);
-  }
-
   formatDate(date: Date | string): string {
     return DateFormat.formatDate(date);
-  }
-
-  truncateText(text: string | undefined, maxLength: number): string {
-    if (!text) return '';
-    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   }
 }

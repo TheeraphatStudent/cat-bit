@@ -1,34 +1,41 @@
 <div class="transaction-history">
   <h3 class="history-title">Transaction History</h3>
-  
+
   <div class="transactions-list" *ngIf="transactions.length > 0; else noTransactions">
-    <div class="transaction-item" 
-         *ngFor="let transaction of transactions"
-         [class.topup]="transaction.type === 'topup'"
-         [class.purchase]="transaction.type === 'purchase'">
-      
+    <div class="transaction-item" *ngFor="let transaction of transactions" [class.topup]="transaction.type === 'topup'"
+      [class.purchase]="transaction.type === 'purchase'">
+
       <div class="transaction-icon">
         <i class="icon" [class.icon-plus]="transaction.type === 'topup'"
-                        [class.icon-minus]="transaction.type === 'purchase'"></i>
+          [class.icon-minus]="transaction.type === 'purchase'"></i>
       </div>
-      
+
       <div class="transaction-details">
-        <span class="transaction-type">
-          {{transaction.type === 'topup' ? 'Wallet Top Up' : 'Game Purchase'}}
-        </span>
+        <div class="transaction-info">
+          <span class="transaction-type">
+            {{transaction.type === 'topup' ? 'Wallet Top Up' : 'Game Purchase'}}
+          </span>
+          <div *ngIf="transaction.game" class="game-info">
+            <img [src]="transaction.game.image" [alt]="transaction.game.name" class="game-thumbnail"
+              onerror="this.src='/assets/default-game.jpg'">
+            <div class="game-details">
+              <span class="game-name">{{transaction.game.name}}</span>
+              <span class="game-type">{{transaction.game.type}}</span>
+            </div>
+          </div>
+        </div>
         <span class="transaction-date">
-          {{formatDateTime(transaction.transactionDate!)}}
+          {{formatDateTime(transaction.transaction_date!)}}
         </span>
       </div>
-      
-      <div class="transaction-amount" 
-           [class.positive]="transaction.type === 'topup'"
-           [class.negative]="transaction.type === 'purchase'">
+
+      <div class="transaction-amount" [class.positive]="transaction.type === 'topup'"
+        [class.negative]="transaction.type === 'purchase'">
         {{transaction.type === 'topup' ? '+' : '-'}}{{formatPrice(transaction.amount)}}
       </div>
     </div>
   </div>
-  
+
   <ng-template #noTransactions>
     <div class="no-transactions">
       <i class="no-transactions-icon"></i>

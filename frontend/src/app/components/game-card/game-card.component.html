@@ -1,10 +1,16 @@
-<div class="game-card pixel-border" (click)="onCardClick()">
+<div class="game-card pixel-border" (click)="onCardClick()" [class.purchased]="game.isPurchased || owned">
   <div class="game-image pixel-border">
     <img [src]="game.image || '/assets/default-game.jpg'" 
          [alt]="game.name" 
          onerror="this.src='/assets/default-game.jpg'">
-    <div class="game-rank pixel-corners-3" *ngIf="game.rank">
+    <div class="game-rank pixel-corners-3" *ngIf="game.rank && !game.isPurchased && !owned">
       #{{game.rank}}
+    </div>
+    <div class="purchased-badge pixel-corners-3" *ngIf="game.isPurchased || owned">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      Purchased
     </div>
   </div>
   
@@ -34,12 +40,16 @@
         <button class="btn-add-cart" 
                 (click)="onAddToCart($event)" 
                 [disabled]="inCart"
-                *ngIf="isAuthenticated() && !owned">
+                *ngIf="isAuthenticated() && !owned && !game.isPurchased">
           {{inCart ? 'In Cart' : 'Add to Cart'}}
         </button>
         
-        <button class="btn-owned" *ngIf="owned" disabled>
-          Owned
+        <button class="btn-purchased" *ngIf="game.isPurchased || owned">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          </svg>
+          View in Library
         </button>
       </div>
     </div>

@@ -128,29 +128,71 @@ router.get('/me', authMiddleware, async (req, res) => {
 // Update user profile
 router.put('/update', authMiddleware, async (req, res) => {
   try {
-    const { username, email } = req.body;
+    const { username, email, profileImage } = req.body;
     const userId = req.user.id;
 
-    // Validate input
-    if (!username || !email) {
-      return res.status(400).json({ message: 'Username and email are required' });
+    // Validate input - at least one field should be provided
+    if (!username && !email && !profileImage) {
+      return res.status(400).json({ message: 'At least one field (username, email, or profileImage) is required' });
     }
 
-    // Check for existing username/email (excluding current user)
-    const existingUser = await pool.query(
-      'SELECT id FROM users WHERE (email = $1 OR username = $2) AND id != $3',
-      [email, username, userId]
-    );
+    // Build dynamic query based on provided fields
+    let updateFields = [];
+    let updateValues = [];
+    let paramCount = 1;
 
-    if (existingUser.rows.length > 0) {
-      return res.status(400).json({ message: 'Username or email already exists' });
+    if (username) {
+      updateFields.push(`username = $${paramCount}`);
+      updateValues.push(username);
+      paramCount++;
     }
+
+    if (email) {
+      updateFields.push(`email = $${paramCount}`);
+      updateValues.push(email);
+      paramCount++;
+    }
+
+    if (profileImage !== undefined) {
+      updateFields.push(`profile_image = $${paramCount}`);
+      updateValues.push(profileImage);
+      paramCount++;
+    }
+
+    // Check for existing username/email (excluding current user) only if they're being updated
+    if (username || email) {
+      let checkQuery = 'SELECT id FROM users WHERE id != $1';
+      let checkValues = [userId];
+      let checkConditions = [];
+
+      if (email) {
+        checkConditions.push(`email = $${checkValues.length + 1}`);
+        checkValues.push(email);
+      }
+
+      if (username) {
+        checkConditions.push(`username = $${checkValues.length + 1}`);
+        checkValues.push(username);
+      }
+
+      if (checkConditions.length > 0) {
+        checkQuery += ' AND (' + checkConditions.join(' OR ') + ')';
+        
+        const existingUser = await pool.query(checkQuery, checkValues);
+
+        if (existingUser.rows.length > 0) {
+          return res.status(400).json({ message: 'Username or email already exists' });
+        }
+      }
+    }
+
+    // Add userId as the last parameter
+    updateValues.push(userId);
 
     // Update user
-    const updatedUser = await pool.query(
-      'UPDATE users SET username = $1, email = $2 WHERE id = $3 RETURNING id, username, email, role, profile_image, wallet_balance',
-      [username, email, userId]
-    );
+    const updateQuery = `UPDATE users SET ${updateFields.join(', ')} WHERE id = $${paramCount} RETURNING id, username, email, role, profile_image, wallet_balance, created_at`;
+    
+    const updatedUser = await pool.query(updateQuery, updateValues);
 
     res.json(updatedUser.rows[0]);
   } catch (error) {

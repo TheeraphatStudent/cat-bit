@@ -5,10 +5,11 @@ export interface Game {
   type: string;
   image?: string;
   description?: string;
-  releaseDate: Date;
+  releaseDate?: Date;
   salesCount?: number;
   rank?: number;
   purchaseDate?: Date;
+  isPurchased?: boolean;
 }
 
 export interface LibraryGame extends Game {

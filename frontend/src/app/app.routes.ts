@@ -6,7 +6,7 @@ import { RoleGuard } from './guards/role.guard';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: '/store',
+    redirectTo: '/login',
     pathMatch: 'full'
   },
   {
@@ -29,6 +29,11 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
+    path: 'your-games',
+    loadComponent: () => import('./pages/your-games/your-games.component').then(m => m.YourGamesComponent),
+    canActivate: [AuthGuard]
+  },
+  {
     path: 'library',
     loadComponent: () => import('./pages/library/library.component').then(m => m.LibraryComponent),
     canActivate: [AuthGuard]
@@ -39,12 +44,17 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
+    path: 'purchase-success',
+    loadComponent: () => import('./pages/purchase-success/purchase-success.component').then(m => m.PurchaseSuccessComponent),
+    canActivate: [AuthGuard]
+  },
+  {
     path: 'admin-dashboard',
     loadComponent: () => import('./pages/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
     canActivate: [AuthGuard, RoleGuard]
   },
   {
     path: '**',
-    redirectTo: '/store'
+    redirectTo: '/login'
   }
 ];

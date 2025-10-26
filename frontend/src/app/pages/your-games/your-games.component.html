@@ -1,0 +1,48 @@
+<div class="your-games-container pixel-border">
+  <div class="your-games-header">
+    <h1 class="title">My Games</h1>
+    <p class="subtitle">Everything you own lives here. Jump back into your favourites anytime.</p>
+  </div>
+
+  <div class="games-grid" *ngIf="loading">
+    <app-skeleton-card type="game" [count]="6"></app-skeleton-card>
+  </div>
+
+  <div class="error-state pixel-border" *ngIf="!loading && error">
+    <h2>Something went wrong</h2>
+    <p>{{error}}</p>
+    <button class="retry-btn" (click)="loadOwnedGames()">Try Again</button>
+  </div>
+
+  <div class="empty-state pixel-border" *ngIf="!loading && !error && ownedGames.length === 0">
+    <h2>No games yet</h2>
+    <p>Browse the store and pick up your first adventure.</p>
+    <button class="browse-btn" (click)="browseStore()">Go to Store</button>
+  </div>
+
+  <div class="games-grid" *ngIf="!loading && !error && ownedGames.length > 0">
+    <div class="game-card pixel-border" *ngFor="let game of ownedGames; trackBy: trackByGameId">
+      <div class="game-image pixel-border">
+        <img [src]="game.image || '/assets/default-game.jpg'"
+             [alt]="game.name"
+             onerror="this.src='/assets/default-game.jpg'">
+        <span class="purchase-badge pixel-corners-3">Purchased {{formatDate(game.purchaseDate)}}</span>
+      </div>
+      <div class="game-info">
+        <h3 class="game-title">{{game.name}}</h3>
+        <p class="game-type">{{game.type}}</p>
+        <p class="game-description">
+          {{game.description || 'No description provided for this game.'}}
+        </p>
+        <div class="game-meta">
+          <span class="release-date" *ngIf="game.releaseDate">Released {{formatDate(game.releaseDate)}}</span>
+          <span class="sales-count" *ngIf="game.salesCount !== undefined">{{game.salesCount | number}} sold</span>
+        </div>
+        <div class="game-footer">
+          <span class="game-price">{{formatPrice(game.price)}}</span>
+          <button class="play-btn pixel-corners-2" (click)="browseStore()">Find Similar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

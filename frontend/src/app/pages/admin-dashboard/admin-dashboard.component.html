@@ -1,4 +1,4 @@
-<div class="admin-container">
+<div class="admin-container pixel-border">
   <div class="admin-header">
     <h1 class="admin-title">Admin Dashboard</h1>
     <p class="admin-subtitle">Manage games, users, and system settings</p>
@@ -12,7 +12,7 @@
         <p>Total Users</p>
       </div>
     </div>
-    
+
     <div class="stat-card">
       <div class="stat-icon games-icon"></div>
       <div class="stat-info">
@@ -20,7 +20,7 @@
         <p>Total Games</p>
       </div>
     </div>
-    
+
     <div class="stat-card">
       <div class="stat-icon sales-icon"></div>
       <div class="stat-info">
@@ -28,7 +28,7 @@
         <p>Total Sales</p>
       </div>
     </div>
-    
+
     <div class="stat-card">
       <div class="stat-icon revenue-icon"></div>
       <div class="stat-info">
@@ -38,33 +38,30 @@
     </div>
   </div>
 
-  <div class="admin-tabs">
-    <button class="tab-btn" 
-            [class.active]="activeTab === 'games'"
-            (click)="setActiveTab('games')">
+  <div class="admin-tabs pixel-corners-2">
+    <button class="tab-btn" [class.active]="activeTab === 'games'" (click)="setActiveTab('games')">
       Games Management
     </button>
-    <button class="tab-btn" 
-            [class.active]="activeTab === 'users'"
-            (click)="setActiveTab('users')">
+    <button class="tab-btn" [class.active]="activeTab === 'users'" (click)="setActiveTab('users')">
       Users Management
     </button>
-    <button class="tab-btn" 
-            [class.active]="activeTab === 'discounts'"
-            (click)="setActiveTab('discounts')">
+    <button class="tab-btn" [class.active]="activeTab === 'discounts'" (click)="setActiveTab('discounts')">
       Discount Codes
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'game-types'" (click)="setActiveTab('game-types')">
+      Game Types
     </button>
   </div>
 
   <!-- Games Management Tab -->
-  <div class="tab-content" *ngIf="activeTab === 'games'">
+  <div class="tab-content pixel-border" *ngIf="activeTab === 'games'">
     <div class="section-header">
       <h2>Games Management</h2>
       <button class="add-btn" (click)="showAddGameModal()">
         Add New Game
       </button>
     </div>
-    
+
     <div class="games-table">
       <table>
         <thead>
@@ -80,10 +77,8 @@
         <tbody>
           <tr *ngFor="let game of games">
             <td>
-              <img [src]="game.image || '/assets/default-game.jpg'" 
-                   [alt]="game.name"
-                   class="game-thumbnail"
-                   onerror="this.src='/assets/default-game.jpg'">
+              <img [src]="game.image || '/assets/default-game.jpg'" [alt]="game.name" class="game-thumbnail"
+                onerror="this.src='/assets/default-game.jpg'">
             </td>
             <td>{{game.name}}</td>
             <td>{{game.type}}</td>
@@ -102,11 +97,11 @@
   </div>
 
   <!-- Users Management Tab -->
-  <div class="tab-content" *ngIf="activeTab === 'users'">
+  <div class="tab-content pixel-border" *ngIf="activeTab === 'users'">
     <div class="section-header">
       <h2>Users Management</h2>
     </div>
-    
+
     <div class="users-table">
       <table>
         <thead>
@@ -128,13 +123,14 @@
                 {{user.role}}
               </span>
             </td>
-            <td>{{formatPrice(user.walletBalance || 0)}}</td>
-            <td>{{formatDate(user.createdAt!)}}</td>
+            <td>{{formatPrice(user.wallet_balance || 0)}}</td>
+            <!-- <td>{{ user | json }}</td> -->
+            <td>{{formatDate(user.created_at!)}}</td>
             <td>
               <div class="action-buttons">
-                <button class="role-btn" (click)="toggleUserRole(user)">
-                  {{user.role === 'admin' ? 'Make User' : 'Make Admin'}}
-                </button>
+                <button class="edit-btn" (click)="toggleUserEdited(user)">Edit</button>
+                <button class="view-btn" (click)="viewUserTransactions(user)"
+                  style="background: #3b82f6;">History</button>
                 <button class="delete-btn" (click)="deleteUser(user)">Delete</button>
               </div>
             </td>
@@ -145,14 +141,14 @@
   </div>
 
   <!-- Discount Codes Tab -->
-  <div class="tab-content" *ngIf="activeTab === 'discounts'">
+  <div class="tab-content pixel-border" *ngIf="activeTab === 'discounts'">
     <div class="section-header">
       <h2>Discount Codes</h2>
       <button class="add-btn" (click)="showAddDiscountModal()">
         Add New Code
       </button>
     </div>
-    
+
     <div class="discounts-table">
       <table>
         <thead>
@@ -168,10 +164,10 @@
         <tbody>
           <tr *ngFor="let discount of discountCodes">
             <td><code>{{discount.code}}</code></td>
-            <td>{{discount.discountValue}}%</td>
-            <td>{{discount.maxUsage}}</td>
-            <td>{{discount.usedCount}}</td>
-            <td>{{discount.expireDate ? formatDate(discount.expireDate) : 'Never'}}</td>
+            <td>{{discount.discount_value}}%</td>
+            <td>{{discount.max_usage}}</td>
+            <td>{{discount.used_count}}</td>
+            <td>{{discount.expire_date ? formatDate(discount.expire_date) : 'Never'}}</td>
             <td>
               <div class="action-buttons">
                 <button class="edit-btn" (click)="editDiscount(discount)">Edit</button>
@@ -181,6 +177,43 @@
           </tr>
         </tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- Edit User Modal -->
+  <div class="modal-overlay" *ngIf="showUserModal" (click)="closeUserModel()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Edit User</h3>
+        <button class="close-btn" (click)="closeUserModel()">×</button>
+      </div>
+      <form [formGroup]="userForm" (ngSubmit)="saveUser()" class="modal-form">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" formControlName="username">
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" formControlName="email">
+        </div>
+        <div class="form-group">
+          <label for="role">Role</label>
+          <select id="role" formControlName="role">
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="wallet_balance">Wallet Balance</label>
+          <input type="number" id="wallet_balance" formControlName="wallet_balance" step="0.01" min="0">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" (click)="closeUserModel()">Cancel</button>
+          <button type="submit" class="save-btn" [disabled]="userForm.invalid || saving">
+            {{saving ? 'Saving...' : 'Save User'}}
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -203,24 +236,25 @@
         <div class="form-group">
           <label for="gameType">Type</label>
           <select id="gameType" formControlName="type">
-            <option value="Action">Action</option>
-            <option value="Adventure">Adventure</option>
-            <option value="RPG">RPG</option>
-            <option value="Strategy">Strategy</option>
-            <option value="Sports">Sports</option>
-            <option value="Racing">Racing</option>
-            <option value="Puzzle">Puzzle</option>
-            <option value="Simulation">Simulation</option>
+            <option value="">Select Type</option>
+            <option *ngFor="let type of gameTypes" [value]="type.name">{{type.name}}</option>
           </select>
         </div>
         <div class="form-group">
           <label for="gameDescription">Description</label>
           <textarea id="gameDescription" formControlName="description" rows="3"></textarea>
         </div>
+        <div class="form-group">
+          <label for="gameImage">Game Image</label>
+          <input type="file" id="gameImage" accept="image/*" (change)="onGameImageSelected($event)">
+          <div *ngIf="gameImagePreview" class="image-preview">
+            <img [src]="gameImagePreview" alt="Preview" style="max-width: 200px; max-height: 200px; margin-top: 10px;">
+          </div>
+        </div>
         <div class="modal-actions">
           <button type="button" class="cancel-btn" (click)="closeGameModal()">Cancel</button>
-          <button type="submit" class="save-btn" [disabled]="gameForm.invalid || saving">
-            {{saving ? 'Saving...' : 'Save Game'}}
+          <button type="submit" class="save-btn" [disabled]="gameForm.invalid || saving || uploadingImage">
+            {{uploadingImage ? 'Uploading...' : (saving ? 'Saving...' : 'Save Game')}}
           </button>
         </div>
       </form>
@@ -236,7 +270,7 @@
       </div>
       <form [formGroup]="discountForm" (ngSubmit)="saveDiscount()" class="modal-form">
         <div class="form-group">
-          <label for="discountCode">Code</label>
+          <label for="discountCode">Discount Code</label>
           <input type="text" id="discountCode" formControlName="code">
         </div>
         <div class="form-group">
@@ -255,6 +289,116 @@
           <button type="button" class="cancel-btn" (click)="closeDiscountModal()">Cancel</button>
           <button type="submit" class="save-btn" [disabled]="discountForm.invalid || saving">
             {{saving ? 'Saving...' : 'Save Code'}}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Game Types Tab -->
+  <div class="tab-content pixel-border" *ngIf="activeTab === 'game-types'">
+    <div class="section-header">
+      <h2>Game Types Management</h2>
+      <button class="add-btn" (click)="showAddGameTypeModal()">
+        Add New Type
+      </button>
+    </div>
+
+    <div class="game-types-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Created Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let gameType of gameTypes">
+            <td>{{gameType.name}}</td>
+            <td>{{formatDate(gameType.created_at!)}}</td>
+            <td>
+              <div class="action-buttons">
+                <button class="edit-btn" (click)="editGameType(gameType)">Edit</button>
+                <button class="delete-btn" (click)="deleteGameType(gameType)">Delete</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- User Transaction History Modal -->
+  <div class="modal-overlay" *ngIf="showTransactionModal" (click)="closeTransactionModal()">
+    <div class="modal" (click)="$event.stopPropagation()" style="max-width: 800px;">
+      <div class="modal-header">
+        <h3>Transaction History - {{editingUser?.username}}</h3>
+        <button class="close-btn" (click)="closeTransactionModal()">×</button>
+      </div>
+      <div class="modal-content">
+        <div *ngIf="loading" style="text-align: center; padding: 20px;">
+          Loading transactions...
+        </div>
+        <div *ngIf="!loading && selectedUserTransactions.length === 0" style="text-align: center; padding: 20px;">
+          No transactions found
+        </div>
+        <table *ngIf="!loading && selectedUserTransactions.length > 0" style="width: 100%;">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Game</th>
+              <th>Amount</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let transaction of selectedUserTransactions">
+              <td>
+                <span [style.color]="transaction.type === 'topup' ? '#10b981' : '#ef4444'">
+                  {{transaction.type === 'topup' ? 'Top Up' : 'Purchase'}}
+                </span>
+              </td>
+              <td>
+                <div *ngIf="transaction.game" style="display: flex; align-items: center; gap: 8px;">
+                  <img [src]="transaction.game.image" [alt]="transaction.game.name"
+                    style="width: 40px; height: 40px; object-fit: cover; border: 2px solid var(--color-secondary-2);"
+                    onerror="this.src='/assets/default-game.jpg'">
+                  <div>
+                    <div style="font-weight: bold;">{{transaction.game.name}}</div>
+                    <div style="font-size: 0.85em; color: var(--color-text-secondary);">{{transaction.game.type}}</div>
+                  </div>
+                </div>
+                <span *ngIf="!transaction.game" style="color: var(--color-text-secondary);">-</span>
+              </td>
+              <td>{{formatPrice(transaction.amount)}}</td>
+              <td>{{formatDate(transaction.transaction_date!)}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="cancel-btn" (click)="closeTransactionModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Game Type Modal -->
+  <div class="modal-overlay" *ngIf="showGameTypeModal" (click)="closeGameTypeModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{editingGameType ? 'Edit Game Type' : 'Add New Game Type'}}</h3>
+        <button class="close-btn" (click)="closeGameTypeModal()">×</button>
+      </div>
+      <form [formGroup]="gameTypeForm" (ngSubmit)="saveGameType()" class="modal-form">
+        <div class="form-group">
+          <label for="gameTypeName">Type Name</label>
+          <input type="text" id="gameTypeName" formControlName="name">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" (click)="closeGameTypeModal()">Cancel</button>
+          <button type="submit" class="save-btn" [disabled]="gameTypeForm.invalid || saving">
+            {{saving ? 'Saving...' : 'Save Type'}}
           </button>
         </div>
       </form>

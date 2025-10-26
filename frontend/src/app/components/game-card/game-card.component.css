@@ -45,6 +45,38 @@
   box-shadow: var(--shadow-md);
 }
 
+.purchased-badge {
+  position: absolute;
+  top: var(--space-md);
+  left: var(--space-md);
+  background: var(--color-success);
+  color: white;
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.purchased-badge svg {
+  flex-shrink: 0;
+}
+
+.game-card.purchased {
+  border-color: var(--color-success);
+  background: linear-gradient(135deg, 
+    rgba(16, 185, 129, 0.05) 0%, 
+    var(--color-surface) 100%);
+}
+
+.game-card.purchased:hover {
+  border-color: var(--color-success);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.2);
+}
+
 .game-info {
   padding: var(--space-md);
   display: flex;
@@ -98,7 +130,7 @@
   color: var(--color-text-primary);
 }
 
-.btn-add-cart, .btn-owned, .btn-login {
+.btn-add-cart, .btn-owned, .btn-login, .btn-purchased {
   padding: var(--space-md) var(--space-md);
   border: none;
   /* border-radius: var(--radius-md); */
@@ -106,6 +138,10 @@
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
   transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
 }
 
 .btn-add-cart {
@@ -155,4 +191,19 @@
 .btn-owned {
   background: var(--color-success);
   color: white;
+}
+
+.btn-purchased {
+  background: var(--color-success);
+  color: white;
+}
+
+.btn-purchased:hover {
+  background: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.btn-purchased svg {
+  flex-shrink: 0;
 }

@@ -1,21 +1,44 @@
 <div class="register-container">
-  <div class="register-card pixel-border">
+  <div class="register-card pixel-border pixel-corners">
     <div class="register-header">
       <div class="brand-logo">
-        <svg class="logo-icon" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-          <polyline points="7.5 4.21 12 6.81 16.5 4.21"></polyline>
-          <polyline points="7.5 19.79 7.5 14.6 3 12"></polyline>
-          <polyline points="21 12 16.5 14.6 16.5 19.79"></polyline>
-          <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-          <line x1="12" y1="22.08" x2="12" y2="12"></line>
-        </svg>
+        <img src="/assets/images/logo.png" alt="Cat bit Logo">
       </div>
       <h1 class="register-title">Create Account</h1>
       <p class="register-subtitle">Join Cat bit and discover amazing games</p>
     </div>
 
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+      <div class="avatar-upload pixel-border pixel-corners">
+        <div class="avatar-preview pixel-corners">
+          <img [src]="profilePreview" alt="Profile preview" onerror="this.src='/assets/images/logo.png'">
+          <div class="preview-overlay" *ngIf="uploadingImage">
+            <svg class="preview-spinner" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="2" x2="12" y2="6"></line>
+              <line x1="12" y1="18" x2="12" y2="22"></line>
+              <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+              <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+              <line x1="2" y1="12" x2="6" y2="12"></line>
+              <line x1="18" y1="12" x2="22" y2="12"></line>
+              <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+              <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+            </svg>
+          </div>
+        </div>
+        <div class="avatar-actions">
+          <button type="button" class="upload-btn pixel-corners" (click)="triggerFileUpload()" [disabled]="uploadingImage">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+            <span>{{ uploadingImage ? 'Uploading...' : 'Upload Avatar' }}</span>
+          </button>
+          <p class="avatar-hint">Square images look best. Max size 5MB.</p>
+          <div class="avatar-error" *ngIf="imageUploadError">{{imageUploadError}}</div>
+        </div>
+        <input type="file" #fileInput accept="image/*" (change)="onFileSelected($event)" hidden>
+      </div>
+
       <div class="form-group">
         <label for="username">
           <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -113,7 +136,7 @@
       </div>
 
       <button type="submit" 
-              class="register-btn pixel-corners-3" 
+              class="register-btn pixel-corners" 
               [disabled]="registerForm.invalid || loading">
         <span *ngIf="!loading">Create Account</span>
         <span *ngIf="loading" class="loading-text">

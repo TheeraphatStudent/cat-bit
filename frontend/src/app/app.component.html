@@ -1,58 +1,14 @@
 <div class="app-container">
-  
   <app-pixel-grid></app-pixel-grid>
+  
   <!-- Navigation Header -->
-  <nav class="navbar" *ngIf="showNavbar">
-    <div class="nav-content">
-      <div class="nav-brand">
-        <h1 class="brand-title" (click)="navigateHome()">Cat bit</h1>
-      </div>
-
-      <div class="nav-links">
-        <a (click)="navigate('/store')"
-           [class.active]="currentRoute === '/store'"
-           class="nav-link">Store</a>
-
-        <ng-container *ngIf="currentUser">
-          <a (click)="navigate('/library')"
-             [class.active]="currentRoute === '/library'"
-             class="nav-link">Library</a>
-
-          <a (click)="navigate('/cart')"
-             [class.active]="currentRoute === '/cart'"
-             class="nav-link cart-link">
-            Cart
-            <span class="cart-badge" *ngIf="cartItemCount > 0">{{cartItemCount}}</span>
-          </a>
-
-          <a (click)="navigate('/profile')"
-             [class.active]="currentRoute === '/profile'"
-             class="nav-link">Profile</a>
-
-          <a (click)="navigate('/admin-dashboard')"
-             [class.active]="currentRoute === '/admin-dashboard'"
-             class="nav-link"
-             *ngIf="isAdmin">Admin</a>
-
-          <button (click)="logout()" class="nav-btn logout-btn">Logout</button>
-        </ng-container>
-
-        <ng-container *ngIf="!currentUser">
-          <a (click)="navigate('/login')"
-             [class.active]="currentRoute === '/login'"
-             class="nav-link">Login</a>
-          <a (click)="navigate('/register')"
-             [class.active]="currentRoute === '/register'"
-             class="nav-btn signup-btn">Sign Up</a>
-        </ng-container>
-      </div>
-    </div>
-  </nav>
+  <app-navbar *ngIf="showNavbar"></app-navbar>
 
   <!-- Main Content -->
   <main class="main-content" [class.with-navbar]="showNavbar">
     <router-outlet></router-outlet>
   </main>
 
-  <!-- <audio id="clickSound" src="../assets/sound/click.mp3"></audio> -->
+  <!-- Pixel Alert Component -->
+  <app-pixel-alert></app-pixel-alert>
 </div>

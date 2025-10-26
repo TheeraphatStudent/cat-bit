@@ -1,37 +1,70 @@
-<div class="profile-container">
-  <div class="profile-header">
-    <h1 class="profile-title">My Profile</h1>
-    <p class="profile-subtitle">Manage your account and wallet</p>
+<div class="profile-container pixel-border pixel-corners">
+  <div class="profile-header pixel-border pixel-corners">
+    <div class="header-content">
+      <div class="user-avatar-large">
+        <img [src]="profileImageUrl" 
+             [alt]="currentUser?.username"
+             class="pixel-corners"
+             onerror="this.src='/assets/images/logo.png'">
+        <div class="avatar-overlay" *ngIf="uploadingImage">
+          <svg class="avatar-spinner" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="2" x2="12" y2="6"></line>
+            <line x1="12" y1="18" x2="12" y2="22"></line>
+            <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+            <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+            <line x1="2" y1="12" x2="6" y2="12"></line>
+            <line x1="18" y1="12" x2="22" y2="12"></line>
+            <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+            <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+          </svg>
+        </div>
+        <button class="change-avatar-btn pixel-corners" (click)="triggerFileUpload()" [disabled]="uploadingImage">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+          <span>Change</span>
+        </button>
+        <input type="file" 
+               #fileInput 
+               (change)="onFileSelected($event)"
+               accept="image/*"
+               style="display: none;">
+      </div>
+      <div class="header-info">
+        <h1 class="profile-title">{{currentUser?.username}}</h1>
+        <p class="profile-subtitle">{{currentUser?.email}}</p>
+        <span class="user-role" [class.admin]="currentUser?.role === 'admin'">
+          {{currentUser?.role === 'admin' ? 'Administrator' : 'User'}}
+        </span>
+      </div>
+    </div>
+    <div class="avatar-error" *ngIf="imageUploadError">{{imageUploadError}}</div>
   </div>
 
   <div class="profile-content">
     <div class="profile-section">
-      <div class="user-info-card">
-        <div class="user-avatar">
-          <img [src]="currentUser?.profileImage || '/assets/default-avatar.jpg'" 
-               [alt]="currentUser?.username"
-               onerror="this.src='/assets/default-avatar.jpg'">
-          <button class="change-avatar-btn" (click)="triggerFileUpload()">
-            Change Photo
-          </button>
-          <input type="file" 
-                 #fileInput 
-                 (change)="onFileSelected($event)"
-                 accept="image/*"
-                 style="display: none;">
+
+      <div class="account-summary pixel-border pixel-corners">
+        <div class="summary-item">
+          <span class="summary-label">Email</span>
+          <span class="summary-value">{{currentUser?.email}}</span>
         </div>
-        
-        <div class="user-details">
-          <h2>{{currentUser?.username}}</h2>
-          <p class="user-email">{{currentUser?.email}}</p>
-          <span class="user-role" [class.admin]="currentUser?.role === 'admin'">
-            {{currentUser?.role === 'admin' ? 'Administrator' : 'User'}}
-          </span>
+        <div class="summary-item">
+          <span class="summary-label">Role</span>
+          <span class="summary-value">{{currentUser?.role === 'admin' ? 'Administrator' : 'Member'}}</span>
         </div>
+        <div class="summary-helper">Keep your details up to date so your purchases stay secure.</div>
       </div>
 
-      <div class="edit-profile-card">
-        <h3>Edit Profile</h3>
+      <div class="edit-profile-card pixel-border pixel-corners">
+        <h3>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          Edit Profile
+        </h3>
         <form [formGroup]="profileForm" (ngSubmit)="updateProfile()" class="profile-form">
           <div class="form-group">
             <label for="username">Username</label>
@@ -63,7 +96,7 @@
 
           <div class="form-actions">
             <button type="submit" 
-                    class="update-btn" 
+                    class="update-btn pixel-corners" 
                     [disabled]="profileForm.invalid || updating">
               {{updating ? 'Updating...' : 'Update Profile'}}
             </button>
@@ -86,7 +119,7 @@
   </div>
 
   <div class="danger-zone">
-    <div class="danger-card">
+    <div class="danger-card pixel-border pixel-corners">
       <h3>Danger Zone</h3>
       <p>Once you delete your account, there is no going back. Please be certain.</p>
       <button class="delete-account-btn" (click)="confirmDeleteAccount()">
@@ -97,7 +130,7 @@
 
   <!-- Delete Confirmation Modal -->
   <div class="modal-overlay" *ngIf="showDeleteModal" (click)="cancelDelete()">
-    <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal pixel-border pixel-corners" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>Delete Account</h3>
         <button class="close-btn" (click)="cancelDelete()">×</button>
